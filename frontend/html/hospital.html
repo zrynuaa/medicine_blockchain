@@ -134,21 +134,35 @@
   	data: function(){
   		return {
   			edit_flag: false,
+  			hospital_confidential_data: {
+          attr:[],
+          hid:[],
+        },
         new_data:{
+          type:0,
           hospital:"",
           patient:"",
+          disease:"",
           doctor:"",
           diagnose:"",
           time:"",
           prescription_ID:"",
-          prescription_content:[],
+          prescription_content:[], //data
+
+          ts:"current timestamp",
+          hospital_ID:"",
+          patient_ID:"",
         },
         new_drug:{
           name:"",
+          chemistry_name:"",
           qty: 0,
           remark: "",
           usage: "",
-        }
+          amount: "",
+        },
+        drug_list:[],
+        history_prescription_list:[],
   		}
   	},
   	methods: {
