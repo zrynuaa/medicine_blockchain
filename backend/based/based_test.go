@@ -26,10 +26,10 @@ func TestPut(t *testing.T) {
 		&Data_pre{"czn","feiyan","zyfxs",1},false,"hid1 OR (cname2 AND region1)"}
 	PutPrescription(c)
 
-	var d = Transaction{1,"pat123456789",&Data_tran{"pre1_1","zyfxs",1,2,"sad",21.13,false}}
+	var d = Transaction{1,"pat123456789",&Data_tran{"pre1_1","zyfxs",1,2,"sad",21.13}}
 	PutTransaction(d)
 
-	var e = Transaction{1,"pat123456789",&Data_tran{"pre1_1","zyfxs",1,2,"wqe",21.13,false}}
+	var e = Transaction{1,"pat123456789",&Data_tran{"pre1_1","zyfxs",1,2,"wqe",21.13}}
 	PutTransaction(e)
 }
 
