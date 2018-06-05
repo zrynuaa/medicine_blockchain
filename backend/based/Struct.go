@@ -20,6 +20,7 @@ type Data_tran struct {
 	Ts uint64 `json:"ts"`
 	Site string `json:"site"`
 	Price float32 `json:"price"`
+	Ishandled bool `json:"ishandled"`
 }
 
 type Presciption struct {

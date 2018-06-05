@@ -5,8 +5,10 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	//"fmt"
 )
 
+//存储处方，输入一个处方
 func PutPrescription(a Presciption) {
 	db, err := leveldb.OpenFile("./db/Prescription.db", nil)
 	if err != nil {
@@ -60,6 +62,7 @@ func PutPrescription(a Presciption) {
 	defer db2.Close()
 }
 
+//存储药品，输入药品
 func PutTransaction(a Transaction) {
 	db, err := leveldb.OpenFile("./db/Transaction.db", nil)
 	if err != nil {
@@ -119,6 +122,8 @@ func PutTransaction(a Transaction) {
 	defer db.Close()
 }
 
+
+//存储
 func PutDose(a Dose) {
 	db, err := leveldb.OpenFile("./db/Dose.db", nil)
 	if err != nil {
@@ -190,6 +195,8 @@ func GetDosedata(medicine_name string, chemistry_name string, chemistry_amount i
 	return chemistry_amount * mamount, float32(chemistry_amount) * float32(mamount) * mprice
 }
 
+
+//根据病人ID或者医院ID查相关药品信息
 func GetPrescriptionByid(id string) []*Presciption {
 	var result []*Presciption
 
@@ -210,6 +217,7 @@ func GetPrescriptionByid(id string) []*Presciption {
 	pres := strings.Split(string(data), ",")
 	for _, pre := range pres {
 		re, err := db.Get([]byte(pre), nil)
+		//fmt.Printf("%s\n",re)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -221,6 +229,23 @@ func GetPrescriptionByid(id string) []*Presciption {
 	return result
 }
 
+//根据病人ID或者医院ID查相关药品信息
+func GetPrescriptionBypreid(preid string) *Presciption {
+	db, err := leveldb.OpenFile("./db/Prescription.db", nil)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	data, err := db.Get([]byte(preid), nil)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	defer db.Close()
+	return deserializePrescription(data)
+}
+
+//根据病人ID查相关药品信息
 func GetTransactionByid(id string) []*Transaction {
 	var result []*Transaction
 
@@ -248,28 +273,57 @@ func GetTransactionByid(id string) []*Transaction {
 	return result
 }
 
-func UpdatePrescription(id string) {
+//输入处方id，将所有对应处方和药品设置成已处理
+func Update(presciption_id string) {
 	db, err := leveldb.OpenFile("./db/Prescription.db", nil)
 	if err != nil {
 		log.Panic(err)
 	}
-	db2, err := leveldb.OpenFile("./db/Mapping.db", nil)
+
+	db2, err := leveldb.OpenFile("./db/Transaction.db", nil)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	data, err := db2.Get([]byte(id), nil)
+	iter := db.NewIterator(nil, nil)
+	for iter.Next() {
+		value := deserializePrescription(iter.Value())
+		if value.Presciption_id == presciption_id {
+			value.Ishandled = true
+			err = db.Put([]byte(presciption_id), value.serialize(), nil)
+			if err != nil {
+				log.Panic(err)
+			}
+			break
+		}
+	}
+	iter.Release()
+	err = iter.Error()
 	if err != nil {
 		log.Panic(err)
 	}
 
-	temp := deserializePrescription(data)
-	temp.Ishandled = true
-
-	err = db.Put([]byte(temp.Presciption_id), temp.serialize(), nil)
+	iter = db2.NewIterator(nil, nil)
+	for iter.Next() {
+		if string(iter.Key())=="last" || len(iter.Key()) > 8 {
+			continue
+		}
+		//fmt.Printf("%s\n",iter.Key())
+		value := deserializeTransaction(iter.Value())
+		if value.Data.Presciption_id == presciption_id {
+			value.Data.Ishandled = true
+			err = db2.Put(iter.Key(), value.serialize(), nil)
+			if err != nil {
+				log.Panic(err)
+			}
+		}
+	}
+	iter.Release()
+	err = iter.Error()
 	if err != nil {
 		log.Panic(err)
 	}
+
 	defer db.Close()
 	defer db2.Close()
 }
