@@ -1,5 +1,7 @@
 package server
 
+import "github.com/scottocs/medicine_blockchain/backend/based"
+
 type Chemistry struct {
 	Chemistry_name string 	`json:"chemistry_name"` //化学名
 	Amount int 				`json:"amount"`			//剂量
@@ -15,11 +17,13 @@ type HospitalPrescription struct {
 	Policy string			`json:"policy"`//加密policy
 }
 
+//化学名与药品关系
 type Dose struct{
 	Cname string
 	Mname []string
 }
 
+//药店属性
 type Drugstore struct {
 	Name string
 	Location string
@@ -27,17 +31,9 @@ type Drugstore struct {
 	Doses []*Dose
 }
 
-type Data_tran struct {
-	Presciption_id string `json:"presciption_id"`
-	Medicine_name string `json:"medicine_name"`
-	Amount int `json:"amount"`
-	Ts uint64 `json:"ts"`
-	Site string `json:"site"`
-	Price float32 `json:"price"`
-	Ishandled bool
-}
-
+//药品信息
 type Transaction struct {
 	Patient_id string
-	Data *Data_tran
+	Data *based.Data_tran
+	Ishandled bool
 }
