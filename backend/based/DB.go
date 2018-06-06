@@ -537,7 +537,7 @@ func GetPrescriptionByattr(attr []string) []*Presciption {
 	return result
 }
 
-//根据处方id/药店名/药品名获取买卖信息是否存在
+//根据处方id/药店名/药品名获取买卖信息是否存在,site和medicine_name输入*为不用
 func IsBuy(presciption_id string, site string, medicine_name string) bool {
 	db, err := leveldb.OpenFile("./db/Buy.db", nil)
 	if err != nil {
@@ -551,7 +551,7 @@ func IsBuy(presciption_id string, site string, medicine_name string) bool {
 		}
 		//fmt.Printf("%s\n",iter.Key())
 		value := deserializeBuy(iter.Value())
-		if value.Data.Presciption_id == presciption_id && value.Data.Site == site && value.Data.Medicine_name == medicine_name{
+		if value.Data.Presciption_id == presciption_id && (value.Data.Site == site || site == "*") && (value.Data.Medicine_name == medicine_name || medicine_name == "*"){
 			return true
 		}
 	}
