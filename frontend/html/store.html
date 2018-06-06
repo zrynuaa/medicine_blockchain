@@ -21,20 +21,22 @@
 
       <!-- tab head -->
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#Pool" data-toggle="tab"><h2>Pool</h2></a></li>
-        <li><a href="#Pending" data-toggle="tab"><h2>Pending</h2></a></li>
-        <li><a href="#Archive" data-toggle="tab"><h2>Archive</h2></a></li>
-        <li><a href="#Closed" data-toggle="tab"><h2>Closed</h2></a></li>
+        <li class="active"><a href="#Pool" data-toggle="tab" @click="getPoolList()"><h2>Pool</h2></a></li>
+        <li><a href="#Pending" data-toggle="tab" @click="getPendingList()"><h2>Pending</h2></a></li>
+        <li><a href="#Archive" data-toggle="tab" ><h2>Archive</h2></a></li>
+        <li><a href="#Closed" data-toggle="tab" @click="getClosedList()"><h2>Closed</h2></a></li>
         <h1 class="pull-right">{{store.name}}</h1>
       </ul>
       <div class="tab-content">
-        <div class="tab-pane fade in active" id="Pool">
+        <div class="tab-pane fade margin-top-5 in active" id="Pool">
+          <v-client-table :columns="columns.pool" :data="lines.pool" :options="options">
+          </v-client-table>
         </div>
-        <div class="tab-pane fade" id="Pending">
+        <div class="tab-pane fade margin-top-5" id="Pending">
         </div>
-        <div class="tab-pane fade" id="Archive">
+        <div class="tab-pane fade margin-top-5" id="Archive">
         </div>
-        <div class="tab-pane fade" id="Closed">
+        <div class="tab-pane fade margin-top-5" id="Closed">
         </div>
       </div>
 
@@ -95,6 +97,26 @@
           site: "邯郸路220号",
           price: 0.00,
         },
+        columns:{
+          pool:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
+          pending:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
+          archive:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
+          closed:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
+        },
+        lines:{
+          pool:[],
+          pending:[],
+          archive:[],
+          closed:[],
+        },
+        options: {
+  				headings: {
+  					xxx: "xxx", //
+  				},
+  				sortable: ["xxx"],
+  				filterable: ["xxx"],
+  			},
+        pool_list:[],
         drug_list:[],
         prescription_list:[],
         pending_list:[],
@@ -130,45 +152,18 @@
   			});
   			return;
   		},
-  		// addDrug: function(aux){
-      //   if (aux=="call") {
-      //     this.new_drug = this.blankDrug()
-      //     $("#Add_Drug_Modal").modal("show"); return;
-      //   }
-      //   var tmp = this.blankDrug()
-      //   tmp.name = this.new_drug.name
-      //   tmp.qty = this.new_drug.qty
-      //   tmp.remark = this.new_drug.remark
-      //   tmp.usage = this.new_drug.usage
-      //
-      //   this.new_data.prescription_content.push(tmp)
-      //
-      //   $("#Add_Drug_Modal").modal("hide"); return;
-  		// },
-  		// getDrugList: function(){
-      //   return 0
-  		// },
-  		// getOneDrugInfo: function(){
-      //   return 0
-  		// },
-  		// getHospitalList: function(){
-      //   return 0
-  		// },
-  		// generatePrescriptionID: function(){
-      //   return 0
-  		// },
-  		// publish: function(){
-      //   return 0
-  		// },
-      // // util functions
-      // blankDrug: function(){
-      //   return {
-      //     name:"",
-      //     qty: 0,
-      //     remark: "",
-      //     usage: "",
-      //   }
-      // },
+      getPoolList: function(){
+        return 0
+  		},
+      getPendingList: function(){
+        return 0
+  		},
+      getClosedList: function(){
+        return 0
+  		},
+      getDrugList: function(){
+        return 0
+  		},
   	},
   	computed: {
   	},
