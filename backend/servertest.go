@@ -7,6 +7,20 @@ import (
 )
 
 func main()  {
+	//设置化学名与药品对应关系
+	d1 := based.Dose{Medicine_name:"Mid1", Chemistry_name:"Cid1", Medicine_amount:2, Medicine_price:1.2}
+	d2 := based.Dose{Medicine_name:"Mid2", Chemistry_name:"Cid1", Medicine_amount:1, Medicine_price:2.2}
+	d3 := based.Dose{Medicine_name:"Mid3", Chemistry_name:"Cid1", Medicine_amount:3, Medicine_price:0.9}
+	d4 := based.Dose{Medicine_name:"Mid8", Chemistry_name:"Cid2", Medicine_amount:2, Medicine_price:1.5}
+	d5 := based.Dose{Medicine_name:"Mid9", Chemistry_name:"Cid2", Medicine_amount:4, Medicine_price:0.78}
+	d6 := based.Dose{Medicine_name:"Mid66", Chemistry_name:"Cid8", Medicine_amount:2, Medicine_price:1.2}
+	var dose []based.Dose
+	dose = append(dose, d1, d2, d3, d4, d5, d6)
+	for _,v := range dose {
+		based.PutDose(v)
+	}
+
+
 	//医院上传处方信息 上链
 	hp := server.HospitalPrescription{Hospital_id:"1234", Patient_id:"350622199009086758", Doctor_id:"67534", Disease:"上呼吸道感染", Policy:"Hid1 OR (Cid AND Rid1)"}
 	var ch []server.Chemistry

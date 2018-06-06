@@ -185,6 +185,7 @@ func IsPostdata(presciption_id string, site string, medicine_name string) bool {
 	if err != nil {
 		return false
 	}
+	defer db.Close()
 	return false
 }
 
@@ -275,12 +276,12 @@ func GetPrescriptionBypreid(preid string) *Presciption {
 func GetPrescriptionByeasypreid(easypreid string) []*Transaction {
 	var result []*Transaction
 	var temp []string
-	
+
 	db, err := leveldb.OpenFile("./db/Prescription.db", nil)
 	if err != nil {
 		return nil
-	}	
-	
+	}
+
 	db2, err := leveldb.OpenFile("./db/Transaction.db", nil)
 	if err != nil {
 		return nil
@@ -298,7 +299,7 @@ func GetPrescriptionByeasypreid(easypreid string) []*Transaction {
 	if err != nil {
 		return nil
 	}
-	
+
 	iter = db2.NewIterator(nil, nil)
 	for iter.Next() {
 		if string(iter.Key())=="last" || len(iter.Key()) > 8 {
@@ -400,4 +401,3 @@ func GetPrescriptionByattr(attr []string) []*Presciption {
 	defer db.Close()
 	return result
 }
-
