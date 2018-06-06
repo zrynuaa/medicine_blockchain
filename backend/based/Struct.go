@@ -22,6 +22,16 @@ type Data_tran struct {
 	Price float32 `json:"price"`
 }
 
+type Data_buy struct {
+	Medicine_name string
+	Chemistry_name string
+	Medicine_amount int
+	Medicine_price float32
+	Presciption_id string
+	Site string
+	Ts uint64
+}
+
 type Presciption struct {
 	Type int
 	Presciption_id string
@@ -29,7 +39,6 @@ type Presciption struct {
 	Patient_id string
 	Ts uint64
 	Data *Data_pre
-	Ishandled bool
 	Policy string
 }
 
@@ -46,6 +55,14 @@ type Dose struct {
 	Medicine_price float32
 }
 
+type Buy struct {
+	Type int
+	Data *Data_buy
+	Patient_id string
+}
+
+//存储的处方结构，data部分可能将来加密
+//在serial的时候加密，一样返回[]byte
 type presciption struct {
 	Type int
 	Presciption_id string
@@ -53,7 +70,6 @@ type presciption struct {
 	Patient_id string
 	Ts uint64
 	Data_pre []byte
-	Ishandled bool
 	Policy string
 }
 
@@ -61,6 +77,12 @@ type transaction struct {
 	Type int
 	Patient_id string
 	Data_tran []byte
+}
+
+type buy struct {
+	Type int
+	Data_buy []byte
+	Patient_id string
 }
 
 func (b *Data_pre)serialize() []byte {
@@ -111,6 +133,30 @@ func deserializeDatatran(d []byte) *Data_tran {
 	return dt
 }
 
+func (b *Data_buy)serialize() []byte {
+	var result bytes.Buffer
+
+	encoder := gob.NewEncoder(&result)
+	err := encoder.Encode(b)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return result.Bytes()
+}
+
+func deserializeDatabuy(d []byte) *Data_buy {
+	dt := new(Data_buy)
+
+	decoder := gob.NewDecoder(bytes.NewReader(d))
+	err := decoder.Decode(&dt)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return dt
+}
+
 func (b *Presciption)serialize() []byte {
 	var result bytes.Buffer
 	temp := new(presciption)
@@ -118,7 +164,6 @@ func (b *Presciption)serialize() []byte {
 	temp.Data_pre = b.Data.serialize()
 	temp.Hospital_id = b.Hospital_id
 	temp.Patient_id = b.Patient_id
-	temp.Ishandled = b.Ishandled
 	temp.Ts = b.Ts
 	temp.Type = b.Type
 	temp.Presciption_id = b.Presciption_id
@@ -146,7 +191,6 @@ func deserializePrescription(d []byte) *Presciption {
 	dp.Data = deserializeDatapre(dptemp.Data_pre)
 	dp.Hospital_id = dptemp.Hospital_id
 	dp.Patient_id = dptemp.Patient_id
-	dp.Ishandled = dptemp.Ishandled
 	dp.Ts = dptemp.Ts
 	dp.Type = dptemp.Type
 	dp.Presciption_id = dptemp.Presciption_id
@@ -213,3 +257,36 @@ func deserializeDose(d []byte) *Dose {
 	return dt
 }
 
+func (b *Buy)serialize() []byte {
+	var result bytes.Buffer
+	temp := new(buy)
+
+	temp.Data_buy = b.Data.serialize()
+	temp.Patient_id = b.Patient_id
+	temp.Type = b.Type
+
+	encoder := gob.NewEncoder(&result)
+	err := encoder.Encode(temp)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return result.Bytes()
+}
+
+func deserializeBuy(d []byte) *Buy {
+	dp := new(Buy)
+	dptemp := new(buy)
+
+	decoder := gob.NewDecoder(bytes.NewReader(d))
+	err := decoder.Decode(&dptemp)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	dp.Data = deserializeDatabuy(dptemp.Data_buy)
+	dp.Patient_id = dptemp.Patient_id
+	dp.Type = dptemp.Type
+
+	return dp
+}

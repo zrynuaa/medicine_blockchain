@@ -121,6 +121,66 @@ func PutTransaction(a Transaction) {
 	defer db.Close()
 }
 
+//存储病人购买信息
+func PutBuy(a Buy) {
+	db, err := leveldb.OpenFile("./db/Buy.db", nil)
+	if err != nil {
+		return
+	}
+
+	aserial := a.serialize()
+
+	last, err := db.Get([]byte("last"), nil)
+	if err != nil {
+		//病人id链接放置id
+		err = db.Put([]byte(a.Patient_id), []byte("1"), nil)
+		if err != nil {
+			return
+		}
+		//放置id链接买卖信息
+		err = db.Put([]byte("1"), []byte(aserial), nil)
+		if err != nil {
+			return
+		}
+		//last链接最后的放置id
+		err = db.Put([]byte("last"), []byte("1"), nil)
+		if err != nil {
+			return
+		}
+	} else {
+		//last链接最后的放置id
+		no, err := strconv.Atoi(string(last))
+		if err != nil {
+			return
+		}
+		plus := strconv.Itoa(no + 1)
+		err = db.Put([]byte("last"), []byte(plus), nil)
+		if err != nil {
+			return
+		}
+		//放置id链接买卖信息
+		err = db.Put([]byte(plus), []byte(aserial), nil)
+		if err != nil {
+			return
+		}
+		//病人id链接放置id
+		data, err := db.Get([]byte(a.Patient_id), nil)
+		if err != nil {
+			err = db.Put([]byte(a.Patient_id), []byte(plus), nil)
+			if err != nil {
+				return
+			}
+		} else {
+			data = append(data, []byte(","+plus)...)
+			err = db.Put([]byte(a.Patient_id), []byte(data), nil)
+			if err != nil {
+				return
+			}
+		}
+	}
+
+	defer db.Close()
+}
 
 //存储剂量信息
 func PutDose(a Dose) {
@@ -162,7 +222,7 @@ func PutDose(a Dose) {
 	defer db.Close()
 }
 
-//判断自己是否已经发布tran
+//药店判断自己是否已经发布tran
 func IsPostdata(presciption_id string, site string, medicine_name string) bool {
 	db, err := leveldb.OpenFile("./db/Transaction.db", nil)
 	if err != nil {
@@ -222,6 +282,49 @@ func GetDosedata(medicine_name string, chemistry_name string, chemistry_amount i
 	return chemistry_amount * mamount, float32(chemistry_amount) * float32(mamount) * mprice
 }
 
+//根据病人ID查买卖信息
+func GetBuyByid(patid string) []*Buy{
+	var result []*Buy
+
+	db, err := leveldb.OpenFile("./db/Buy.db", nil)
+	if err != nil {
+		return nil
+	}
+
+	if patid != "*" {
+		data, err := db.Get([]byte(patid), nil)
+		if err != nil {
+			return nil
+		}
+
+		pres := strings.Split(string(data), ",")
+		for _, pre := range pres {
+			re, err := db.Get([]byte(pre), nil)
+			//fmt.Printf("%s\n",re)
+			if err != nil {
+				return nil
+			}
+
+			result = append(result, deserializeBuy(re))
+		}
+	}else { //监管部门使用
+		iter := db.NewIterator(nil, nil)
+		for iter.Next() {
+			if string(iter.Key())=="last" || len(iter.Key()) > 8 {
+				continue
+			}
+			value := deserializeBuy(iter.Value())
+			result = append(result, value)
+		}
+		iter.Release()
+		err = iter.Error()
+		if err != nil {
+			return nil
+		}
+	}
+	defer db.Close()
+	return result
+}
 
 //根据病人ID或者医院ID查相关药品信息
 func GetPrescriptionByid(id string) []*Presciption {
@@ -236,21 +339,35 @@ func GetPrescriptionByid(id string) []*Presciption {
 		return nil
 	}
 
-	data, err := db2.Get([]byte(id), nil)
-	if err != nil {
-		return nil
-	}
-
-	pres := strings.Split(string(data), ",")
-	for _, pre := range pres {
-		re, err := db.Get([]byte(pre), nil)
-		//fmt.Printf("%s\n",re)
+	if id != "*" {
+		data, err := db2.Get([]byte(id), nil)
 		if err != nil {
 			return nil
 		}
 
-		result = append(result, deserializePrescription(re))
+		pres := strings.Split(string(data), ",")
+		for _, pre := range pres {
+			re, err := db.Get([]byte(pre), nil)
+			//fmt.Printf("%s\n",re)
+			if err != nil {
+				return nil
+			}
+
+			result = append(result, deserializePrescription(re))
+		}
+	}else {
+		iter := db.NewIterator(nil, nil)
+		for iter.Next() {
+			value := deserializePrescription(iter.Value())
+			result = append(result, value)
+		}
+		iter.Release()
+		err = iter.Error()
+		if err != nil {
+			return nil
+		}
 	}
+
 	defer db.Close()
 	defer db2.Close()
 	return result
@@ -329,52 +446,70 @@ func GetTransactionByid(id string) []*Transaction {
 		return nil
 	}
 
-	data, err := db.Get([]byte(id), nil)
-	if err != nil {
-		return nil
-	}
-
-	pres := strings.Split(string(data), ",")
-	for _, pre := range pres {
-		re, err := db.Get([]byte(pre), nil)
-		//fmt.Printf("%s\n",re)
+	if id != "*" {
+		data, err := db.Get([]byte(id), nil)
 		if err != nil {
 			return nil
 		}
 
-		result = append(result, deserializeTransaction(re))
+		pres := strings.Split(string(data), ",")
+		for _, pre := range pres {
+			re, err := db.Get([]byte(pre), nil)
+			//fmt.Printf("%s\n",re)
+			if err != nil {
+				return nil
+			}
+
+			result = append(result, deserializeTransaction(re))
+		}
+	}else {
+		iter := db.NewIterator(nil, nil)
+		for iter.Next() {
+			if string(iter.Key())=="last" || len(iter.Key()) > 8 {
+				continue
+			}
+			value := deserializeTransaction(iter.Value())
+			result = append(result, value)
+		}
+		iter.Release()
+		err = iter.Error()
+		if err != nil {
+			return nil
+		}
 	}
+
 	defer db.Close()
 	return result
 }
 
-//输入处方id，将对应处方设置成已处理
-func Update(presciption_id string) {
-	db, err := leveldb.OpenFile("./db/Prescription.db", nil)
-	if err != nil {
-		return
-	}
+//输入处方id，将对应处方设置成已处理                ////////////////废弃
 
-	iter := db.NewIterator(nil, nil)
-	for iter.Next() {
-		value := deserializePrescription(iter.Value())
-		if value.Presciption_id == presciption_id {
-			value.Ishandled = true
-			err = db.Put([]byte(presciption_id), value.serialize(), nil)
-			if err != nil {
-				return
-			}
-			break
-		}
-	}
-	iter.Release()
-	err = iter.Error()
-	if err != nil {
-		return
-	}
-
-	defer db.Close()
-}
+//func Update(presciption_id string) {
+//	db, err := leveldb.OpenFile("./db/Prescription.db", nil)
+//	if err != nil {
+//		return
+//	}
+//
+//	iter := db.NewIterator(nil, nil)
+//	for iter.Next() {
+//		value := deserializePrescription(iter.Value())
+//		if value.Presciption_id == presciption_id {
+//			value.Ishandled = true
+//			err = db.Put([]byte(presciption_id), value.serialize(), nil)
+//			if err != nil {
+//				return
+//			}
+//			break
+//		}
+//	}
+//	iter.Release()
+//	err = iter.Error()
+//	if err != nil {
+//		return
+//	}
+//
+//	defer db.Close()
+//}
 
 //根据药店属性获取对应处方
 func GetPrescriptionByattr(attr []string) []*Presciption {
@@ -401,3 +536,31 @@ func GetPrescriptionByattr(attr []string) []*Presciption {
 	defer db.Close()
 	return result
 }
+
+//根据处方id/药店名/药品名获取买卖信息是否存在
+func IsBuy(presciption_id string, site string, medicine_name string) bool {
+	db, err := leveldb.OpenFile("./db/Buy.db", nil)
+	if err != nil {
+		return false
+	}
+
+	iter := db.NewIterator(nil, nil)
+	for iter.Next() {
+		if string(iter.Key())=="last" || len(iter.Key()) > 8 {
+			continue
+		}
+		//fmt.Printf("%s\n",iter.Key())
+		value := deserializeBuy(iter.Value())
+		if value.Data.Presciption_id == presciption_id && value.Data.Site == site && value.Data.Medicine_name == medicine_name{
+			return true
+		}
+	}
+	iter.Release()
+	err = iter.Error()
+	if err != nil {
+		return false
+	}
+	defer db.Close()
+	return false
+}
+
