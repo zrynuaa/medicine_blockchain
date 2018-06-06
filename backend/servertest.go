@@ -15,34 +15,40 @@ func main()  {
 	hp.Chemistrys = ch
 
 	fmt.Println("医院处方信息:", hp)
+	server.PrescriptiontoTransaction(hp)
 
-	//server.PrescriptiontoTransaction(hp)
+	fmt.Println("病人处方信息:")
+	for _,v := range  based.GetPrescriptionByid(hp.Patient_id){
+		fmt.Println(v,v.Data)
+	}
 
 	//药店获取药品信息
-	fmt.Println((based.GetPrescriptionByid(hp.Patient_id))[0])
-	fmt.Println((based.GetPrescriptionByid(hp.Patient_id))[1])
-
+	fmt.Println("\n药店基本信息:")
 	drugstore1 := server.SetStore1Attrs()
 	fmt.Println(drugstore1, drugstore1.Doses[0].Mname)
 	drugstore2 := server.SetStore2Attrs()
 	fmt.Println(drugstore2, drugstore2.Doses[0].Mname)
 
+	fmt.Println("\n药店1能解密的信息:")
 	tr1 := server.StoregetMInfo(drugstore1)
 	for _,v := range tr1{
 		fmt.Println(v, v.Data)
 	}
 
+	fmt.Println("\n药店2能解密的信息:")
 	tr2 := server.StoregetMInfo(drugstore2)
 	for _,v := range tr2{
 		fmt.Println(v, v.Data)
 	}
 
 	//药店上传药品信息
-	server.StoresendTransaction(tr1[1]) //TODO openfile failed ,can't store tran
+	server.StoresendTransaction(tr1[1])
+	fmt.Println("\n病人查看药品信息:")
 	for _,t := range based.GetTransactionByid(hp.Patient_id) {
 		fmt.Println(t, t.Data)
 	}
 
+	fmt.Println("\n更新处方状态:")
 	based.Update(based.GetPrescriptionByid(hp.Patient_id)[0].Presciption_id)
 	fmt.Println((based.GetPrescriptionByid(hp.Patient_id))[0])
 }

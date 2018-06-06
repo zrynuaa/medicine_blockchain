@@ -63,19 +63,19 @@ func StoregetMInfo(store Drugstore) []Transaction {
 	num := len(pres)
 	//trans := make([]Transaction,num)
 	var trans []Transaction
-	tran := new(Transaction)
 
 	for i:=0;i<num;i++{
-		tran.Data = new(based.Data_tran)
+		var tran Transaction
 		tran.Patient_id = pres[i].Patient_id
-
-		tran.Data.Presciption_id = pres[i].Presciption_id
-		tran.Data.Ts = pres[i].Ts
-		tran.Data.Site = store.Location
 
 		mname := GetMedicineName(store, pres[i].Data.Chemistry_name)	//获取药品名称
 
 		for _,name := range mname {
+			tran.Data = new(based.Data_tran)
+			tran.Data.Presciption_id = pres[i].Presciption_id
+			tran.Data.Ts = pres[i].Ts
+			tran.Data.Site = store.Location
+
 			tran.Data.Medicine_name = name
 			amount, totalprice := based.GetDosedata(name, pres[i].Data.Chemistry_name, pres[i].Data.Amount)
 			tran.Data.Amount = amount
@@ -88,8 +88,7 @@ func StoregetMInfo(store Drugstore) []Transaction {
 				tran.Ishandled = based.IsPostdata(tran.Data.Presciption_id, store.Location, name)
 			}
 
-			//TODO 后一个Mid会将后一个Mid覆盖掉
-			trans = append(trans, *tran)
+			trans = append(trans, tran)
 		}
 	}
 	return trans
