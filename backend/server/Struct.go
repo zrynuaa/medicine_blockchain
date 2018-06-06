@@ -35,5 +35,5 @@ type Drugstore struct {
 type Transaction struct {
 	Patient_id string
 	Data *based.Data_tran
-	Ishandled bool
+	Ishandled int //0药店未发布, 1药店已发布, 2处方已完成
 }

@@ -41,61 +41,53 @@ func Sethandle(w http.ResponseWriter, r *http.Request)  {
 	StoresendTransaction(tran)
 }
 
-func Supervision(w http.ResponseWriter, r *http.Request)  {
-	json.NewEncoder(w).Encode(based.GetPrescriptionByid("*"))
-}
-
-func UsergetPrescriptions(w http.ResponseWriter, r *http.Request)  {
+func GetPrescriptions(w http.ResponseWriter, r *http.Request)  {
 	json.NewEncoder(w).Encode(based.GetPrescriptionByid(r.Form["username"][0]))
 }
 
-func UsergetTransactions(w http.ResponseWriter, r *http.Request) {
+func GetTransactions(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(based.GetTransactionByid(r.Form["username"][0]))
 }
 
+func GetBuys(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(based.GetBuyByid(r.Form["username"][0]))
+}
+
 func UserbuyMedicine(w http.ResponseWriter, r *http.Request) {
-	var tran Transaction
+	var tran based.Transaction
 	json.NewDecoder(r.Body).Decode(&tran)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	based.Update(tran.Data.Presciption_id)//将该处方信息的isHandled置为true
+	BuyMedicine(tran)
 }
-
-//func Hospital(w http.ResponseWriter, r *http.Request) {
-//	if r.Method == "GET" {
-//		//t, _ := template.ParseFiles("/home/zry/go/src/github.com/scottocs/medicine_blockchain/frontend/html/hospital.html")
-//		t, _ := template.ParseFiles("/home/zry/go/src/github.com/zrynuaa/template/login.gtpl")
-//		t.Execute(w, nil)
-//	}
-//}
 
 func Run()  {
 
 	finish := make(chan bool)
 
 	server8880 := http.NewServeMux()
-	AddHandletoServer(server8880)
-	//server8880.HandleFunc("/", Hospital)
-	server8880.HandleFunc("/HospitalSendPrescription", HospitalSendPrescription)
+	AddHandletoServer(server8880, "hospital.html")
+	server8880.HandleFunc("/hospitalsendprescription", HospitalSendPrescription)
 
 	server8881 := http.NewServeMux()
-	AddHandletoServer(server8881)
+	AddHandletoServer(server8881, "store.html")
 	drugstore1 = SetStore1Attrs()
 	server8881.HandleFunc("/", Store1getMInfo)
-	server8881.HandleFunc("/Sethandle1", Sethandle)
+	server8881.HandleFunc("/sethandle1", Sethandle)
 
 	server8882 := http.NewServeMux()
-	AddHandletoServer(server8882)
+	AddHandletoServer(server8882, "store.html")
 	drugstore2 = SetStore2Attrs()
 	server8882.HandleFunc("/", Store2getMInfo)
-	server8882.HandleFunc("/Sethandle2", Sethandle)
+	server8882.HandleFunc("/sethandle2", Sethandle)
 
 	server8883 := http.NewServeMux()
-	AddHandletoServer(server8883)
-	server8883.HandleFunc("/", Supervision)
-	server8883.HandleFunc("/UsergetPrescriptions", UsergetPrescriptions)
-	server8883.HandleFunc("/UsergetTransactions", UsergetTransactions)
-	server8883.HandleFunc("/UserbuyMedicine", UserbuyMedicine)
+	AddHandletoServer(server8883, "controller.html")
+	//server8883.HandleFunc("/", Supervision)
+	server8883.HandleFunc("/getprescriptions", GetPrescriptions)
+	server8883.HandleFunc("/gettransactions", GetTransactions)
+	server8883.HandleFunc("/getbuys", GetBuys)
+	server8883.HandleFunc("/userbuymedicine", UserbuyMedicine)
 
 	go func() {
 		http.ListenAndServe(":8880", server8880)

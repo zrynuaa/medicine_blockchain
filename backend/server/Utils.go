@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+//医院发布处方信息
 func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 
 	var ptot based.Presciption
@@ -19,7 +20,6 @@ func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 	ptot.Hospital_id = pre.Hospital_id
 	ptot.Patient_id = pre.Patient_id
 	ptot.Ts = uint64(time.Now().Unix())
-	ptot.Ishandled = false
 
 	num := len(pre.Chemistrys)
 	ptot.Data = new(based.Data_pre)
@@ -41,27 +41,21 @@ func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 		if i>0{
 			easypreid = easypreid[:len(easypreid)-1]
 		}
-		easypreid += strconv.Itoa(i+1)
+		easypreid += "_" + strconv.Itoa(i+1)
 		ptot.Presciption_id = easypreid
 
 		based.PutPrescription(ptot)//处方上链
 	}
-
-	var ptots []*based.Presciption
-	ptots = based.GetPrescriptionByid(ptot.Patient_id)
-	for i:=0;i<len(ptots);i++{
-		fmt.Println(ptots[i],ptots[i].Data.Chemistry_name, ptots[i].Data.Amount)
-	}
 	return true
 }
 
+//药店获取能解密的处方信息,处理成药品信息
 func StoregetMInfo(store Drugstore) []Transaction {
 
 	attrs := store.Attrs
 	pres := based.GetPrescriptionByattr(attrs)//获取药店能够解密的所有的处方信息
 
 	num := len(pres)
-	//trans := make([]Transaction,num)
 	var trans []Transaction
 
 	for i:=0;i<num;i++{
@@ -82,10 +76,12 @@ func StoregetMInfo(store Drugstore) []Transaction {
 			tran.Data.Price = totalprice
 
 			//药方以处理时,该药品信息不能操作.药方未处理时,查看链上是否存在该药品信息,若存在则不能操作
-			if pres[i].Ishandled {
-				tran.Ishandled = true
+			if based.IsBuy(pres[i].Presciption_id, "*", "*") {
+				tran.Ishandled = 2
 			}else {
-				tran.Ishandled = based.IsPostdata(tran.Data.Presciption_id, store.Location, name)
+				if based.IsPostdata(tran.Data.Presciption_id, store.Location, name) {
+					tran.Ishandled = 1
+				}
 			}
 
 			trans = append(trans, tran)
@@ -105,11 +101,24 @@ func StoresendTransaction(tran Transaction)  {
 	based.PutTransaction(ttot)
 }
 
-func AddHandletoServer(server *http.ServeMux)  {
+//用户通过监管节点买药,发布买药信息
+func BuyMedicine(tran based.Transaction)  {
+	var buy based.Buy
+	data := tran.Data
+
+	buy.Type = 2
+	buy.Patient_id = tran.Patient_id
+
+	buy.Data = &based.Data_buy{Presciption_id:data.Presciption_id, Medicine_name:data.Medicine_name, Medicine_amount:data.Amount, Medicine_price:data.Price,Site:data.Site}
+	buy.Data.Ts = uint64(time.Now().Unix())
+	based.PutBuy(buy)
+}
+
+func AddHandletoServer(server *http.ServeMux, filename string)  {
 	fss := http.FileServer(http.Dir(os.Getenv("GOPATH")+"/src/github.com/scottocs/medicine_blockchain/frontend/static"))
 	fsh := http.FileServer(http.Dir(os.Getenv("GOPATH")+"/src/github.com/scottocs/medicine_blockchain/frontend/html"))
 	server.Handle("/static/", http.StripPrefix("/static/", fss))
-	server.Handle("/html/", http.StripPrefix("/html/", fsh))
+	server.Handle("/html/", http.StripPrefix("/html/" + filename, fsh))
 }
 
 func GetMedicineName(store Drugstore, cname string) []string {
