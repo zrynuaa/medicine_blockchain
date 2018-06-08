@@ -39,6 +39,7 @@ func Sethandle(w http.ResponseWriter, r *http.Request)  {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	StoresendTransaction(tran)
+	fmt.Fprint(w,http.StatusOK)
 }
 
 func GetPrescriptions(w http.ResponseWriter, r *http.Request)  {
