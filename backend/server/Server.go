@@ -43,15 +43,17 @@ func Sethandle(w http.ResponseWriter, r *http.Request)  {
 }
 
 func GetPrescriptions(w http.ResponseWriter, r *http.Request)  {
-	json.NewEncoder(w).Encode(based.GetPrescriptionByid(r.FormValue("username")))
+	pres,_ := GetreadyInfo("Prescription", r.FormValue("username"))
+	json.NewEncoder(w).Encode(pres)
 }
 
 func GetTransactions(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(based.GetTransactionByid(r.Form["username"][0]))
+	trans,_ := GetreadyInfo("Transaction", r.FormValue("username"))
+	json.NewEncoder(w).Encode(trans)
 }
 
 func GetBuys(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(based.GetBuyByid(r.Form["username"][0]))
+	json.NewEncoder(w).Encode(based.GetBuyByid(r.FormValue("username")))
 }
 
 func UserbuyMedicine(w http.ResponseWriter, r *http.Request) {
@@ -60,10 +62,10 @@ func UserbuyMedicine(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	BuyMedicine(tran)
+	fmt.Fprint(w,http.StatusOK)
 }
 
 func Run()  {
-
 	finish := make(chan bool)
 
 	server8880 := http.NewServeMux()
@@ -90,21 +92,13 @@ func Run()  {
 	server8883.HandleFunc("/getbuys", GetBuys)
 	server8883.HandleFunc("/userbuymedicine", UserbuyMedicine)
 
-	go func() {
-		http.ListenAndServe(":8880", server8880)
-	}()
-
-	go func() {
-		http.ListenAndServe(":8881", server8881)
-	}()
-
-	go func() {
-		http.ListenAndServe(":8882", server8882)
-	}()
-
-	go func() {
-		http.ListenAndServe(":8883", server8883)
-	}()
+	go http.ListenAndServe(":8880", server8880)
+	go http.ListenAndServe(":8881", server8881)
+	go http.ListenAndServe(":8882", server8882)
+	go http.ListenAndServe(":8883", server8883)
 
 	<-finish
 }
+
+
+

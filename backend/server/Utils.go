@@ -35,11 +35,11 @@ func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 		ptot.Data.Chemistry_name = pre.Chemistrys[i].Chemistry_name
 		ptot.Data.Amount = pre.Chemistrys[i].Amount
 		//policy := pre.Policy
-		policy := strings.Replace(pre.Policy,"Cid",pre.Chemistrys[i].Chemistry_name, -1)
+		policy := strings.Replace(pre.Policy,"cid",pre.Chemistrys[i].Chemistry_name, -1)
 		ptot.Policy = policy
 
 		if i>0{
-			easypreid = easypreid[:len(easypreid)-1]
+			easypreid = easypreid[:len(easypreid)-2]
 		}
 		easypreid += "_" + strconv.Itoa(i+1)
 		ptot.Presciption_id = easypreid
@@ -75,12 +75,18 @@ func StoregetMInfo(store Drugstore) []Transaction {
 			tran.Data.Amount = amount
 			tran.Data.Price = totalprice
 
-			//药方以处理时,该药品信息不能操作.药方未处理时,查看链上是否存在该药品信息,若存在则不能操作
+			//药方已处理时,该药品信息不能操作.药方未处理时,查看链上是否存在该药品信息,若存在则不能操作
 			if based.IsBuy(pres[i].Presciption_id, "*", "*") {
-				tran.Ishandled = 2
+				if based.IsBuy(tran.Data.Presciption_id,store.Location,name) {
+					tran.Ishandled = 3		//该药品是该药店卖的
+				}else {
+					tran.Ishandled = 2
+				}
 			}else {
 				if based.IsPostdata(tran.Data.Presciption_id, store.Location, name) {
 					tran.Ishandled = 1
+				}else {
+					tran.Ishandled = 0
 				}
 			}
 
@@ -101,6 +107,33 @@ func StoresendTransaction(tran Transaction)  {
 	based.PutTransaction(ttot)
 }
 
+//获取链上数据
+func GetreadyInfo(mark, username string) ([]Presciption, []Transaction) {
+	if mark == "Prescription"{
+		var pres []Presciption
+		for _,v := range based.GetPrescriptionByid(username){
+			pre := new(Presciption)
+			pre.Data = v
+			if based.IsBuy(v.Presciption_id,"*","*"){
+				pre.Isbuy = 1
+			}
+			pres = append(pres, *pre)
+		}
+		return pres,nil
+	}else {
+		var trans []Transaction
+		for _,v := range based.GetTransactionByid(username){
+			tran := new(Transaction)
+			tran.Data = v.Data
+			tran.Patient_id = v.Patient_id
+			if based.IsBuy(v.Data.Presciption_id,"*","*"){
+				tran.Ishandled = 2
+			}
+			trans = append(trans, *tran)
+		}
+		return nil,trans
+	}
+}
 //用户通过监管节点买药,发布买药信息
 func BuyMedicine(tran based.Transaction)  {
 	var buy based.Buy
