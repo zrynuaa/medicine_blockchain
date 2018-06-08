@@ -33,7 +33,12 @@ type Drugstore struct {
 
 //药品信息
 type Transaction struct {
-	Patient_id string
-	Data *based.Data_tran
-	Ishandled int //0药店未发布, 1药店已发布, 2处方已完成
+	Patient_id string `json:"patient_id"`
+	Data *based.Data_tran `json:"data"`
+	Ishandled int `json:"ishandled"`//0药店未发布, 1药店已发布, 2处方已完成, 3该药店卖的
+}
+
+type Presciption struct {
+	based.Presciption 
+	Isbuy int `json:"isbuy"`		//0处方为处理, 1处方已处理
 }
