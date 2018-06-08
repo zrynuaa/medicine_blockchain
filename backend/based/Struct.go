@@ -23,29 +23,28 @@ type Data_tran struct {
 }
 
 type Data_buy struct {
-	Medicine_name string
-	Chemistry_name string
-	Medicine_amount int
-	Medicine_price float32
-	Presciption_id string
-	Site string
-	Ts uint64
+	Medicine_name string `json:"medicine_name"`
+	Medicine_amount int `json:"medicine_amount"`
+	Medicine_price float32 `json:"medicine_price"`
+	Presciption_id string `json:"presciption_id"`
+	Site string `json:"site"`
+	Ts uint64 `json:"ts"`
 }
 
 type Presciption struct {
-	Type int
-	Presciption_id string
-	Hospital_id string
-	Patient_id string
-	Ts uint64
-	Data *Data_pre
-	Policy string
+	Type int `json:"type"`
+	Presciption_id string `json:"presciption_id"`
+	Hospital_id string `json:"hospital_id"`
+	Patient_id string `json:"patient_id"`
+	Ts uint64 `json:"ts"`
+	Data *Data_pre `json:"data"`
+	Policy string `json:"policy"`
 }
 
 type Transaction struct {
-	Type int
-	Patient_id string
-	Data *Data_tran
+	Type int `json:"type"`
+	Patient_id string `json:"patient_id"`
+	Data *Data_tran `json:"data"`
 }
 
 type Dose struct {
@@ -56,9 +55,9 @@ type Dose struct {
 }
 
 type Buy struct {
-	Type int
-	Data *Data_buy
-	Patient_id string
+	Type int `json:"type"`
+	Data *Data_buy `json:"data"`
+	Patient_id string `json:"patient_id"`
 }
 
 //存储的处方结构，data部分可能将来加密
