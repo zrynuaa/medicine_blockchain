@@ -30,6 +30,7 @@
       <div class="tab-content">
         <div class="tab-pane fade margin-top-5 in active" id="Pool">
           <v-client-table :columns="columns.pool" :data="lines.pool" :options="options">
+              <div slot="Ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-on:click="handle(props.row)" v-bind:disabled="props.row.Ishandled!=0"><span class="glyphicon glyphicon-plus" v-show="props.row.Ishandled==0">接单</span><span class="glyphicon glyphicon-ok" v-show="props.row.Ishandled!=0"></span></button></div>
           </v-client-table>
         </div>
         <div class="tab-pane fade margin-top-5" id="Pending">
@@ -113,7 +114,7 @@
   				headings: {
   					xxx: "xxx", //
   				},
-  				sortable: ["xxx"],
+  				sortable: ["Patient_id", "presciption_id", "medicine_name","amount","site","price","Ishandled",],
   				filterable: ["xxx"],
   			},
         pool_list:[],
@@ -152,31 +153,61 @@
   			});
   			return;
   		},
+  		handle: function(row){
+  			var _this = this;
+  			var postData = {};
+
+        console.log("aaaaaaaaa");
+        postData["Patient_id"] = row["Patient_id"]
+        postData.Data = {}
+        postData.Data.presciption_id = row["presciption_id"]
+        postData.Data.medicine_name = row["medicine_name"]
+        postData.Data.amount = row["amount"]
+        postData.Data.ts = row["ts"]
+        postData.Data.site = row["site"]
+        postData.Data.price = row["price"]
+        postData["Ishandled"] = 1
+
+        console.log(postData);
+
+        // return
+
+        $.ajax({
+          type: 'POST',
+          url: "http://"+window.location.host + "/sethandle1",
+          data: JSON.stringify(postData),
+          success: function(result){
+
+            console.log("bbbb");
+            console.log(result);
+            if (result==200) {
+                console.log("xxxxxxx");
+                _this.lines.pool[row.key].Ishandled = 1
+            }
+          },
+          dataType: "json"
+        });
+  		},
       getPoolList: function(){
         var _this = this;
+        _this.lines.pool = []
 
   			$.post("http://"+window.location.host + "/",{},function(data,status){
   				if (status=="success") {
-            // ###################
             console.log(data);
             var objs = eval(data)
-            // console.log(objs);
-            console.log(objs);
 
-            // $.each();
             $.each(objs, function(k,v){
-                console.log(v)
                 var tmp = {}
+                tmp["key"] = k
                 tmp["Patient_id"] = v["Patient_id"]
-                // v.Data = eval(v.Data)
                 tmp["presciption_id"] = v.Data.presciption_id
-                console.log(v.Data.presciption_id)
                 tmp["medicine_name"] = v.Data["medicine_name"]
                 tmp["amount"] = v.Data["amount"]
                 tmp["ts"] = v.Data["ts"]
                 tmp["site"] = v.Data["site"]
                 tmp["price"] = v.Data["price"]
-                tmp["Ishandled"] = v.Ishandled
+                tmp["Ishandled"] = v["Ishandled"]
 
                 _this.lines.pool.push(tmp)
             });
@@ -198,6 +229,7 @@
   	computed: {
   	},
   	created(){
+  		this.getPoolList();
   		// this.fetch_person_info();
   		// this.fetch_history_record();
   	}
