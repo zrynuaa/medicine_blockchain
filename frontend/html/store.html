@@ -160,9 +160,24 @@
             // ###################
             console.log(data);
             var objs = eval(data)
-            console.log(objs);
+            // console.log(objs);
+
+            // $.each();
+            $.each(objs, function(k,v){
+                var tmp = {}
+                tmp["Patient_id"] = v["Patient_id"]
+                tmp["presciption_id"] = v.Data["presciption_id"]
+                tmp["medicine_name"] = v.Data["medicine_name"]
+                tmp["amount"] = v.Data["amount"]
+                tmp["ts"] = v.Data["ts"]
+                tmp["site"] = v.Data["site"]
+                tmp["price"] = v.Data["price"]
+                tmp["Ishandled"] = v.Ishandled
+
+                _this.lines.pool.push(tmp)
+            });
             // return
-            _this.lines.pool = objs
+            // _this.lines.pool = objs
   					// console.log(data)
   				}else{alert("Error!Code: "+status);}
   			});
