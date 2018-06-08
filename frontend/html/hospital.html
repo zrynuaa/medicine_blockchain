@@ -206,7 +206,7 @@
 
         $.ajax({
           type: 'POST',
-          url: "hospitalsendprescription",
+          url: window.location.host + "/hospitalsendprescription",
           data: JSON.stringify(postData),
           success: function(result){
             console.log(result);
