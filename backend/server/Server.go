@@ -43,7 +43,7 @@ func Sethandle(w http.ResponseWriter, r *http.Request)  {
 }
 
 func GetPrescriptions(w http.ResponseWriter, r *http.Request)  {
-	json.NewEncoder(w).Encode(based.GetPrescriptionByid(r.Form["username"][0]))
+	json.NewEncoder(w).Encode(based.GetPrescriptionByid(r.FormValue("username")))
 }
 
 func GetTransactions(w http.ResponseWriter, r *http.Request) {
@@ -108,6 +108,3 @@ func Run()  {
 
 	<-finish
 }
-
-
-
