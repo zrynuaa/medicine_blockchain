@@ -65,6 +65,14 @@
             <span><input type="text" class="form-control" v-model="new_data.prescription_ID" placeholder="generate automated"></input></span>
           </div>
         </div>
+          <div class="col-md-12 well">
+          <div class="col-xs-6">
+            <span>policy:: </span>
+          </div>
+          <div class="col-xs-6">
+            <span><input type="text" class="form-control" v-model="new_data.policy" placeholder="xx"></input></span>
+          </div>
+        </div>
         <div class="col-md-12 well">
           <div class="col-xs-6">
             <span>prescription content:: </span>
@@ -190,7 +198,7 @@
             "doctor_id":this.new_data.doctor,
             "disease":this.new_data.diagnose,
             "chemistrys":this.new_data.prescription_content,
-            "policy":"xcbdvsi uabcdkujvcyvcfh"
+            "policy":this.new_data.policy,
         }
         // console.log(this.new_data)
         // console.log(postData)
@@ -198,10 +206,13 @@
 
         $.ajax({
           type: 'POST',
-          url: "http://localhost:8880/HospitalSendPrescription",
+          url: "http://localhost:8880/hospitalsendprescription",
           data: JSON.stringify(postData),
           success: function(result){
             console.log(result);
+            if (result==200) {
+
+            }
             //code:: notice hospital the result.
           },
           dataType: "json"
