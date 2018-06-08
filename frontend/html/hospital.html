@@ -172,7 +172,7 @@
         }
         var tmp = this.blankDrug()
         tmp.chemistry_name = this.new_drug.name
-        tmp.amount = this.new_drug.qty
+        tmp.amount = parseInt(this.new_drug.qty)
 
         this.new_data.prescription_content.push(tmp)
 
@@ -201,9 +201,6 @@
             // "policy":this.new_data.policy,
             "policy":"Hid1 OR (Cid AND Rid1)",
         }
-        // console.log(this.new_data)
-        // console.log(postData)
-        // return
 
         $.ajax({
           type: 'POST',
@@ -211,9 +208,6 @@
           data: JSON.stringify(postData),
           success: function(result){
             console.log(result);
-            if (result==200) {
-
-            }
             //code:: notice hospital the result.
           },
           dataType: "json"
