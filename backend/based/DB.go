@@ -10,10 +10,12 @@ import (
 //存储处方，输入一个处方
 func PutPrescription(a Presciption) {
 	db, err := leveldb.OpenFile("./db/Prescription.db", nil)
+	defer db.Close()
 	if err != nil {
 		return
 	}
 	db2, err := leveldb.OpenFile("./db/Mapping.db", nil)
+	defer db2.Close()
 	if err != nil {
 		return
 	}
@@ -57,13 +59,14 @@ func PutPrescription(a Presciption) {
 			return
 		}
 	}
-	defer db.Close()
-	defer db2.Close()
+
+
 }
 
 //存储药品，输入药品
 func PutTransaction(a Transaction) {
 	db, err := leveldb.OpenFile("./db/Transaction.db", nil)
+	defer db.Close()
 	if err != nil {
 		return
 	}
@@ -118,12 +121,13 @@ func PutTransaction(a Transaction) {
 			}
 		}
 	}
-	defer db.Close()
+
 }
 
 //存储病人购买信息
 func PutBuy(a Buy) {
 	db, err := leveldb.OpenFile("./db/Buy.db", nil)
+	defer db.Close()
 	if err != nil {
 		return
 	}
@@ -179,12 +183,12 @@ func PutBuy(a Buy) {
 		}
 	}
 
-	defer db.Close()
 }
 
 //存储剂量信息
 func PutDose(a Dose) {
 	db, err := leveldb.OpenFile("./db/Dose.db", nil)
+	defer db.Close()
 	if err != nil {
 		return
 	}
@@ -219,12 +223,12 @@ func PutDose(a Dose) {
 			return
 		}
 	}
-	defer db.Close()
 }
 
 //药店判断自己是否已经发布tran
 func IsPostdata(presciption_id string, site string, medicine_name string) bool {
 	db, err := leveldb.OpenFile("./db/Transaction.db", nil)
+	defer db.Close()
 	if err != nil {
 		return false
 	}
@@ -245,7 +249,6 @@ func IsPostdata(presciption_id string, site string, medicine_name string) bool {
 	if err != nil {
 		return false
 	}
-	defer db.Close()
 	return false
 }
 
@@ -256,6 +259,7 @@ func GetDosedata(medicine_name string, chemistry_name string, chemistry_amount i
 	//一剂量药品单价
 	var mprice float32 = 0.0
 	db, err := leveldb.OpenFile("./db/Dose.db", nil)
+	defer db.Close()
 	if err != nil {
 		return 0,0.0
 	}
@@ -278,7 +282,6 @@ func GetDosedata(medicine_name string, chemistry_name string, chemistry_amount i
 		return 0,0.0
 	}
 
-	defer db.Close()
 	return chemistry_amount * mamount, float32(chemistry_amount) * float32(mamount) * mprice
 }
 
@@ -287,6 +290,7 @@ func GetBuyByid(patid string) []*Buy{
 	var result []*Buy
 
 	db, err := leveldb.OpenFile("./db/Buy.db", nil)
+	defer db.Close()
 	if err != nil {
 		return nil
 	}
@@ -322,7 +326,6 @@ func GetBuyByid(patid string) []*Buy{
 			return nil
 		}
 	}
-	defer db.Close()
 	return result
 }
 
@@ -331,10 +334,12 @@ func GetPrescriptionByid(id string) []*Presciption {
 	var result []*Presciption
 
 	db, err := leveldb.OpenFile("./db/Prescription.db", nil)
+	defer db.Close()
 	if err != nil {
 		return nil
 	}
 	db2, err := leveldb.OpenFile("./db/Mapping.db", nil)
+	defer db2.Close()
 	if err != nil {
 		return nil
 	}
@@ -368,14 +373,13 @@ func GetPrescriptionByid(id string) []*Presciption {
 		}
 	}
 
-	defer db.Close()
-	defer db2.Close()
 	return result
 }
 
 //根据详细处方ID查相关药品信息
 func GetPrescriptionBypreid(preid string) *Presciption {
 	db, err := leveldb.OpenFile("./db/Prescription.db", nil)
+	defer db.Close()
 	if err != nil {
 		return nil
 	}
@@ -385,7 +389,6 @@ func GetPrescriptionBypreid(preid string) *Presciption {
 		return nil
 	}
 
-	defer db.Close()
 	return deserializePrescription(data)
 }
 
@@ -395,11 +398,13 @@ func GetPrescriptionByeasypreid(easypreid string) []*Transaction {
 	var temp []string
 
 	db, err := leveldb.OpenFile("./db/Prescription.db", nil)
+	defer db.Close()
 	if err != nil {
 		return nil
 	}
 
 	db2, err := leveldb.OpenFile("./db/Transaction.db", nil)
+	defer db2.Close()
 	if err != nil {
 		return nil
 	}
@@ -433,7 +438,6 @@ func GetPrescriptionByeasypreid(easypreid string) []*Transaction {
 		return nil
 	}
 
-	defer db.Close()
 	return result
 }
 
@@ -442,6 +446,7 @@ func GetTransactionByid(id string) []*Transaction {
 	var result []*Transaction
 
 	db, err := leveldb.OpenFile("./db/Transaction.db", nil)
+	defer db.Close()
 	if err != nil {
 		return nil
 	}
@@ -478,7 +483,6 @@ func GetTransactionByid(id string) []*Transaction {
 		}
 	}
 
-	defer db.Close()
 	return result
 }
 
@@ -516,6 +520,7 @@ func GetPrescriptionByattr(attr []string) []*Presciption {
 	var result []*Presciption
 
 	db, err := leveldb.OpenFile("./db/Prescription.db", nil)
+	defer db.Close()
 	if err != nil {
 		return nil
 	}
@@ -533,13 +538,13 @@ func GetPrescriptionByattr(attr []string) []*Presciption {
 		return nil
 	}
 
-	defer db.Close()
 	return result
 }
 
 //根据处方id/药店名/药品名获取买卖信息是否存在,site和medicine_name输入*为不用
 func IsBuy(presciption_id string, site string, medicine_name string) bool {
 	db, err := leveldb.OpenFile("./db/Buy.db", nil)
+	defer db.Close()
 	if err != nil {
 		return false
 	}
@@ -560,7 +565,6 @@ func IsBuy(presciption_id string, site string, medicine_name string) bool {
 	if err != nil {
 		return false
 	}
-	defer db.Close()
 	return false
 }
 
