@@ -118,7 +118,7 @@ func AddHandletoServer(server *http.ServeMux, filename string)  {
 	fss := http.FileServer(http.Dir(os.Getenv("GOPATH")+"/src/github.com/scottocs/medicine_blockchain/frontend/static"))
 	fsh := http.FileServer(http.Dir(os.Getenv("GOPATH")+"/src/github.com/scottocs/medicine_blockchain/frontend/html"))
 	server.Handle("/static/", http.StripPrefix("/static/", fss))
-	server.Handle("/html/", http.StripPrefix("/html/" + filename, fsh))
+	server.Handle("/html/"+ filename, http.StripPrefix("/html/", fsh))
 }
 
 func GetMedicineName(store Drugstore, cname string) []string {
