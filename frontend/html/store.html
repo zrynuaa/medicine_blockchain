@@ -153,6 +153,18 @@
   			return;
   		},
       getPoolList: function(){
+        var _this = this;
+
+  			$.post("http://localhost:8881/",postData,function(data,status){
+  				if (status=="success") {
+            // ###################
+            console.log(data);
+            return
+            _this.pool_list = data
+  					console.log(data)
+  				}else{alert("Error!Code: "+status);}
+  			});
+
         return 0
   		},
       getPendingList: function(){
