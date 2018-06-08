@@ -155,7 +155,7 @@
       getPoolList: function(){
         var _this = this;
 
-  			$.post(window.location.host + "/",{},function(data,status){
+  			$.post("http://"+window.location.host + "/",{},function(data,status){
   				if (status=="success") {
             // ###################
             console.log(data);
