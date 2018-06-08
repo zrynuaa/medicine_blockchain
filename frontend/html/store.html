@@ -98,7 +98,7 @@
           price: 0.00,
         },
         columns:{
-          pool:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
+          pool:["Patient_id", "presciption_id", "medicine_name","amount","ts","site","price","Ishandled",],
           pending:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
           archive:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
           closed:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
@@ -161,12 +161,16 @@
             console.log(data);
             var objs = eval(data)
             // console.log(objs);
+            console.log(objs);
 
             // $.each();
             $.each(objs, function(k,v){
+                console.log(v)
                 var tmp = {}
                 tmp["Patient_id"] = v["Patient_id"]
-                tmp["presciption_id"] = v.Data["presciption_id"]
+                // v.Data = eval(v.Data)
+                tmp["presciption_id"] = v.Data.presciption_id
+                console.log(v.Data.presciption_id)
                 tmp["medicine_name"] = v.Data["medicine_name"]
                 tmp["amount"] = v.Data["amount"]
                 tmp["ts"] = v.Data["ts"]
@@ -176,9 +180,6 @@
 
                 _this.lines.pool.push(tmp)
             });
-            // return
-            // _this.lines.pool = objs
-  					// console.log(data)
   				}else{alert("Error!Code: "+status);}
   			});
 
