@@ -159,9 +159,11 @@
   				if (status=="success") {
             // ###################
             console.log(data);
-            return
-            _this.pool_list = data
-  					console.log(data)
+            var objs = eval(data)
+            console.log(objs);
+            // return
+            _this.lines.pool = objs
+  					// console.log(data)
   				}else{alert("Error!Code: "+status);}
   			});
 
