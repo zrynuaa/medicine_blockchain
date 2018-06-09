@@ -75,14 +75,14 @@ func Run()  {
 	server8881 := http.NewServeMux()
 	AddHandletoServer(server8881, "store.html")
 	drugstore1 = SetStore1Attrs()
-	server8881.HandleFunc("/", Store1getMInfo)
-	server8881.HandleFunc("/sethandle1", Sethandle)
+	server8881.HandleFunc("/getprelist8881", Store1getMInfo)
+	server8881.HandleFunc("/sethandle8881", Sethandle)
 
 	server8882 := http.NewServeMux()
 	AddHandletoServer(server8882, "store.html")
 	drugstore2 = SetStore2Attrs()
-	server8882.HandleFunc("/", Store2getMInfo)
-	server8882.HandleFunc("/sethandle2", Sethandle)
+	server8882.HandleFunc("/getprelist8882", Store2getMInfo)
+	server8882.HandleFunc("/sethandle8882", Sethandle)
 
 	server8883 := http.NewServeMux()
 	AddHandletoServer(server8883, "controller.html")

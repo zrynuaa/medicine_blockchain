@@ -177,7 +177,7 @@
 
         $.ajax({
           type: 'POST',
-          url: "http://"+window.location.host + "/sethandle"+_this.storeID,
+          url: "http://"+window.location.host + "/sethandle"+window.location.port,
           data: JSON.stringify(postData),
           success: function(result){
             if (result==200) {
@@ -192,7 +192,7 @@
         var _this = this;
         _this.lines.pool = []
 
-  			$.post("http://"+window.location.host + "/",{},function(data,status){
+  			$.post("http://"+window.location.host + "/getprelist"+window.location.port,{},function(data,status){
   				if (status=="success") {
             // console.log(data);
             if (data==null||data==undefined) { return }
