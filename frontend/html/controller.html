@@ -13,110 +13,222 @@
 
     <style media="screen">
       .margin-top-5{margin-top: 5px;}
+      .font-size-x2{font-size: 200%;}
     </style>
 
   </head>
   <body>
-    <div class="container-fluid" id="master-page">
-
-      <!-- main view -->
-      <div class="row">
-        <div class="col-xs-12">
+    <div class="container-fluid margin-top-5" id="master-page">
+      <!-- tab head -->
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#Presciption" data-toggle="tab" @click="getPrescription()"><h2>处方</h2></a></li>
+        <li><a href="#Transaction" data-toggle="tab" @click="getTransaction()"><h2>购物车</h2></a></li>
+        <li><a href="#Buys" data-toggle="tab" @click="getBuys()"><h2>购买历史</h2></a></li>
+        <h1 class="pull-right">
+          <select v-model="username" @change="changeUser()" class="form-control">
+            <option value="*">终端</option>
+            <option value="patientid1">病人A</option>
+            <option value="patientid2">病人B</option>
+          </select>
+        </h1>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade margin-top-5 in active" id="Presciption">
           <v-client-table :columns="columns.prescription" :data="lines.prescription" :options="options">
-              <!-- <div slot="Ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-on:click="handle(props.row)" v-bind:disabled="props.row.Ishandled!=0"><span class="glyphicon glyphicon-plus" v-show="props.row.Ishandled==0">接单</span><span class="glyphicon glyphicon-ok" v-show="props.row.Ishandled!=0"></span></button></div> -->
+              <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}}</div>
           </v-client-table>
         </div>
+        <div class="tab-pane fade margin-top-5" id="Transaction">
+          <v-client-table :columns="columns.transaction" :data="lines.transaction" :options="options">
+              <div slot="chemistry_name" slot-scope="props">{{chemistry[props.row.chemistry_name]}}</div>
+          </v-client-table>
+        </div>
+        <div class="tab-pane fade margin-top-5" id="Buys">
+        </div>
+      </div>
       </div>
 
     </div>
   </body>
 
+  <!-- map for  chinese name -->
+  <script src="../static/info/map.js" charset="utf-8"></script>
   <!-- vue -->
   <script>
-  Vue.use(VueTables.ClientTable);
-  var app = new Vue({
-  	el: '#master-page',
-  	data: function(){
-  		return {
-  			edit_flag: false,
-        columns:{
-          prescription:["key", "isbuy",  "hospital_id",  "patient_id",  "policy",  "presciption_id",  "ts",  "type",  "amount",  "chemistry_name",  "disease",  "doctor_id",],
-          pending:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
-          archive:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
-          closed:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
-        },
-        options: {
-  				headings: {
-  					xxx: "xxx", //
-  				},
-  				sortable: ["key", "isbuy",  "hospital_id",  "patient_id",  "policy",  "presciption_id",  "ts",  "type",  "amount",  "chemistry_name",  "disease",  "doctor_id",],
-  				filterable: ["xxx"],
-  			},
-        lines:{
-          prescription:[],
-        },
-  		}
-  	},
-  	methods: {
-      getPrescription: function(){
-        var _this = this;
-        _this.lines.prescription = []
-        var postData = {}
-        postData["username"] = "*"
+      Vue.use(VueTables.ClientTable);
+      var app = new Vue({
+      	el: '#master-page',
+      	data: function(){
+      		return {
+      			medicine: medicine,
+      			chemistry: chemistry,
+      			username: "*",
+      			edit_flag: false,
+            columns:{
+              prescription:["key", "isbuy",  "hospital_id",  "patient_id",  "policy",  "presciption_id",  "_ts",  "type",  "amount",  "chemistry_name",  "disease",  "doctor_id",],
+              transaction:["key", "patient_id",  "ishandled",  "amount",  "medicine_name",  "presciption_id",  "price",  "site",  "_ts",],
+              buy:["key", "isbuy",  "hospital_id",  "patient_id",  "policy",  "presciption_id",  "_ts",  "type",  "amount",  "chemistry_name",  "disease",  "doctor_id",],
+            },
+            options: {
+      				headings: {
+      					xxx: "xxx", //
+      				},
+      				sortable: ["key", "isbuy",  "hospital_id",  "patient_id",  "policy",  "presciption_id",  "_ts",  "type",  "amount",  "chemistry_name",  "disease",  "doctor_id",],
+      				filterable: ["xxx"],
+      			},
+            lines:{
+              prescription:[],
+              transaction:[],
+              buy:[],
+            },
+      		}
+      	},
+      	methods: {
+          getPrescription: function(){
+            var _this = this;
+            _this.lines.prescription = []
+            var postData = {}
+            postData["username"] = _this.username
 
-  			$.post("http://"+window.location.host + "/getprescriptions",postData,function(data,status){
-  				if (status=="success") {
-            // console.log(data)
-            var objs = eval(data)
-            console.log(objs)
-            // return
+      			$.post("http://"+window.location.host + "/getprescriptions",postData,function(data,status){
+      				if (status=="success") {
+                var objs = eval(data)
+                if (objs==null) {return}
+                console.log(objs)
 
-            $.each(objs, function(k,v){
-                var tmp = {}
-                tmp["key"] = k
-                tmp["isbuy"] = v["isbuy"]
+                $.each(objs, function(k,v){
+                    var tmp = {}
+                    tmp["key"] = k
+                    tmp["isbuy"] = v["isbuy"]
 
-                tmp["hospital_id"] = v.data.hospital_id
-                tmp["patient_id"] = v.data.patient_id
-                tmp["policy"] = v.data.policy
-                tmp["presciption_id"] = v.data.presciption_id
-                tmp["ts"] = v.data.ts
-                tmp["type"] = v.data.type
+                    tmp["hospital_id"] = v.data.hospital_id
+                    tmp["patient_id"] = v.data.patient_id
+                    tmp["policy"] = v.data.policy
+                    tmp["presciption_id"] = v.data.presciption_id
+                    tmp["ts"] = v.data.ts
+                    tmp["type"] = v.data.type
 
-                tmp["amount"] = v.data.data.amount
-                tmp["chemistry_name"] = v.data.data.chemistry_name
-                tmp["disease"] = v.data.data.disease
-                tmp["doctor_id"] = v.data.data.doctor_id
+                    tmp["amount"] = v.data.data.amount
+                    tmp["chemistry_name"] = v.data.data.chemistry_name
+                    tmp["disease"] = v.data.data.disease
+                    tmp["doctor_id"] = v.data.data.doctor_id
 
-                _this.lines.prescription.push(tmp)
+                    tmp["_ts"] = (new Date(v.data.ts*1000)).toLocaleString()
+
+                    _this.lines.prescription.push(tmp)
+                });
+      				}else{alert("Error!Code: "+status);}
+      			});
+          },
+          getTransaction: function(){
+            var _this = this;
+            _this.lines.transaction = []
+            var postData = {}
+            postData["username"] = _this.username
+
+      			$.post("http://"+window.location.host + "/gettransactions",postData,function(data,status){
+      				if (status=="success") {
+                var objs = eval(data)
+                if (objs==null) {return}
+                console.log(objs)
+
+                // ###################  to be discussed
+                $.each(objs, function(k,v){
+                    var tmp = {}
+                    tmp["key"] = k
+                    tmp["patient_id"] = v.patient_id
+                    tmp["ishandled"] = v.ishandled
+
+                    tmp["amount"] = v.data.amount
+                    tmp["medicine_name"] = v.data.medicine_name
+                    tmp["presciption_id"] = v.data.presciption_id
+                    tmp["price"] = v.data.price
+                    tmp["site"] = v.data.site
+                    tmp["ts"] = v.data.ts
+
+                    tmp["_ts"] = (new Date(v.data.ts*1000)).toLocaleString()
+
+                    _this.lines.transaction.push(tmp)
+                });
+
+      				}else{alert("Error!Code: "+status);}
+      			});
+          },
+          getBuys: function(){
+            var _this = this;
+            _this.lines.transaction = []
+            var postData = {}
+            postData["username"] = _this.username
+
+      			$.post("http://"+window.location.host + "/getbuys",postData,function(data,status){
+      				if (status=="success") {
+                var objs = eval(data)
+                if (objs==null) {return}
+                console.log(objs)
+                return
+                // ###################  to be discussed
+                $.each(objs, function(k,v){
+                    var tmp = {}
+                    tmp["key"] = k
+                    tmp["patient_id"] = v.patient_id
+                    tmp["ishandled"] = v.ishandled
+
+                    tmp["amount"] = v.data.amount
+                    tmp["medicine_name"] = v.data.medicine_name
+                    tmp["presciption_id"] = v.data.presciption_id
+                    tmp["price"] = v.data.price
+                    tmp["site"] = v.data.site
+                    tmp["ts"] = v.data.ts
+
+                    _this.lines.transaction.push(tmp)
+                });
+
+      				}else{alert("Error!Code: "+status);}
+      			});
+          },
+          buy: function(row){
+
+      			var _this = this;
+      			var postData = {};
+            postData.patient_id = row["patient_id"]
+            postData.ishandled = row["ishandled"]
+            postData.data = {}
+
+            postData.data.presciption_id = row["presciption_id"]
+            postData.data.medicine_name = row["medicine_name"]
+            postData.data.amount = row["amount"]
+            postData.data.ts = row["ts"]
+            postData.data.site = row["site"]
+            postData.data.price = row["price"]
+            postData["ishandled"] = 1
+
+            console.log(postData);
+
+            $.ajax({
+              type: 'POST',
+              url: "http://"+window.location.host + "/userbuymedicine",
+              data: JSON.stringify(postData),
+              success: function(result){
+                  console.log(result);
+                  // console.log("xxxxxxx");
+                  // _this.lines.pool[row.key].ishandled = 1
+              },
+              dataType: "json"
             });
-  				}else{alert("Error!Code: "+status);}
-  			});
-      },
-      getTransactions: function(){
-        var _this = this;
-        _this.lines.prescription = []
-        var postData = {}
-        postData["username"] = "*"
-
-  			$.post("http://"+window.location.host + "/gettransactions",postData,function(data,status){
-  				if (status=="success") {
-            console.log(data)
-            var objs = eval(data)
-            console.log(objs)
-            return
-            // ###################  to be discussed
-
-  				}else{alert("Error!Code: "+status);}
-  			});
-      },
-  	},
-  	computed: {
-  	},
-  	created(){
-      this.getPrescription()
-      // this.getTransactions()
-  	}
-  });
+          },
+          changeUser: function(){
+            this.getPrescription()
+            this.getTransaction()
+            this.getBuys()
+          },
+      	},
+      	computed: {
+      	},
+      	created(){
+          this.getPrescription()
+          this.getTransaction()
+          this.getBuys()
+      	}
+      });
   </script>
 </html>

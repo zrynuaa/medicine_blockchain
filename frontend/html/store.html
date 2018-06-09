@@ -21,19 +21,24 @@
 
       <!-- tab head -->
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#Pool" data-toggle="tab" @click="getPoolList()"><h2>Pool</h2></a></li>
-        <li><a href="#Pending" data-toggle="tab" @click="getPendingList()"><h2>Pending</h2></a></li>
-        <li><a href="#Archive" data-toggle="tab" ><h2>Archive</h2></a></li>
-        <li><a href="#Closed" data-toggle="tab" @click="getClosedList()"><h2>Closed</h2></a></li>
+        <li class="active"><a href="#Pool" data-toggle="tab" @click="getPoolList()"><h2>交易市场</h2></a></li>
+        <li><a href="#Pending" data-toggle="tab" @click="getPendingList()"><h2>已接单</h2></a></li>
+        <!-- <li><a href="#Archive" data-toggle="tab" ><h2></h2></a></li> -->
+        <li><a href="#Closed" data-toggle="tab" @click="getClosedList()"><h2>已成交</h2></a></li>
         <h1 class="pull-right">{{store.name}}</h1>
       </ul>
       <div class="tab-content">
         <div class="tab-pane fade margin-top-5 in active" id="Pool">
           <v-client-table :columns="columns.pool" :data="lines.pool" :options="options">
-              <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-on:click="handle(props.row)" v-bind:disabled="props.row.ishandled!=0"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==0">接单</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=0"></span></button></div>
+              <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div>
+              <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-on:click="handle(props.row)" v-bind:disabled="props.row.ishandled!=0"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==0"> 接单</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=0"></span></button></div>
           </v-client-table>
         </div>
         <div class="tab-pane fade margin-top-5" id="Pending">
+          <v-client-table :columns="columns.pending" :data="lines.pending" :options="options">
+              <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div>
+              <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-bind:disabled="props.row.ishandled!=1"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==1"> 成交</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=1"></span></button></div>
+          </v-client-table>
         </div>
         <div class="tab-pane fade margin-top-5" id="Archive">
         </div>
@@ -76,15 +81,9 @@
     </div>
 
   </body>
-  <script>
-  //获取url中的参数
-  function getUrlParam(name) {
-    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
-    var r = window.location.search.substr(1).match(reg); //匹配目标参数
-    if (r != null) return unescape(r[2]); return null; //返回参数值
-  }
-  </script>
 
+  <!-- map for  chinese name -->
+  <script src="../static/info/map.js" charset="utf-8"></script>
   <!-- vue -->
   <script>
   Vue.use(VueTables.ClientTable);
@@ -92,6 +91,7 @@
   	el: '#master-page',
   	data: function(){
   		return {
+    		medicine: medicine,
         storeID: 1,
   			store: {
           name: "吉星大药房",
@@ -108,7 +108,8 @@
           price: 0.00,
         },
         columns:{
-          pool:["patient_id", "presciption_id", "medicine_name","amount","ts","site","price","ishandled",],
+          pool:["patient_id", "presciption_id", "medicine_name","amount","_ts","site","price","ishandled",],
+          pending:["patient_id", "presciption_id", "medicine_name","amount","_ts","site","price","ishandled",],
         },
         lines:{
           pool:[],
@@ -120,7 +121,7 @@
   				headings: {
   					xxx: "xxx", //
   				},
-  				sortable: ["patient_id", "presciption_id", "medicine_name","amount","site","price","ishandled",],
+  				sortable: ["patient_id", "presciption_id", "medicine_name","amount","site","price","ishandled","ts",],
   				filterable: ["xxx"],
   			},
         pool_list:[],
@@ -191,26 +192,35 @@
       getPoolList: function(){
         var _this = this;
         _this.lines.pool = []
+        _this.lines.pending = []
 
   			$.post("http://"+window.location.host + "/getprelist"+window.location.port,{},function(data,status){
   				if (status=="success") {
-            // console.log(data);
-            if (data==null||data==undefined) { return }
             var objs = eval(data)
+            console.log(objs);
+            if (objs==null) {return}
 
+            var cnt_pending = 0
+            var cnt_pool = 0
             $.each(objs, function(k,v){
                 var tmp = {}
-                tmp["key"] = k
                 tmp["patient_id"] = v.patient_id
                 tmp["presciption_id"] = v.data.presciption_id
                 tmp["medicine_name"] = v.data.medicine_name
                 tmp["amount"] = v.data.amount
+                tmp["_ts"] = (new Date(v.data.ts*1000)).toLocaleString()
                 tmp["ts"] = v.data.ts
                 tmp["site"] = v.data.site
                 tmp["price"] = v.data.price
                 tmp["ishandled"] = v.ishandled
 
-                _this.lines.pool.push(tmp)
+                if (v.ishandled==1) {
+                  tmp["key"] = cnt_pending++
+                  _this.lines.pending.push(tmp)
+                }else{
+                  tmp["key"] = cnt_pool++
+                  _this.lines.pool.push(tmp)
+                }
             });
   				}else{alert("Error!Code: "+status);}
   			});
