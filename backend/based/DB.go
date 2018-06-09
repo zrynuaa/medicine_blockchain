@@ -192,22 +192,22 @@ func PutBuy(a Buy) {
 
 //存储剂量信息
 func PutDose(a Dose) {
-	db, err := leveldb.OpenFile("./db/Dose.db", nil)
-	defer db.Close()
-	if err != nil {
-		return
-	}
+	//db, err := leveldb.OpenFile("./db/Dose.db", nil)
+	//defer db.Close()
+	//if err != nil {
+	//	return
+	//}
 
 	aserial := a.serialize()
-	last, err := db.Get([]byte("last"), nil)
+	last, err := Sdb_Dose.Get([]byte("last"), nil)
 	if err != nil {
 		//放置id链接剂量信息
-		err = db.Put([]byte("1"), []byte(aserial), nil)
+		err = Sdb_Dose.Put([]byte("1"), []byte(aserial), nil)
 		if err != nil {
 			return
 		}
 		//last链接最后的放置id
-		err = db.Put([]byte("last"), []byte("1"), nil)
+		err = Sdb_Dose.Put([]byte("last"), []byte("1"), nil)
 		if err != nil {
 			return
 		}
@@ -218,12 +218,12 @@ func PutDose(a Dose) {
 			return
 		}
 		plus := strconv.Itoa(no + 1)
-		err = db.Put([]byte("last"), []byte(plus), nil)
+		err = Sdb_Dose.Put([]byte("last"), []byte(plus), nil)
 		if err != nil {
 			return
 		}
 		//放置id链接剂量信息
-		err = db.Put([]byte(plus), []byte(aserial), nil)
+		err = Sdb_Dose.Put([]byte(plus), []byte(aserial), nil)
 		if err != nil {
 			return
 		}
@@ -334,7 +334,7 @@ func GetBuyByid(patid string) []*Buy{
 	return result
 }
 
-//根据病人ID或者医院ID查相关药品信息
+//根据病人ID或者医院ID查相关处方信息
 func GetPrescriptionByid(id string) []*Presciption {
 	var result []*Presciption
 
@@ -381,7 +381,7 @@ func GetPrescriptionByid(id string) []*Presciption {
 	return result
 }
 
-//根据详细处方ID查相关药品信息
+//根据详细处方ID查相关处方信息
 func GetPrescriptionBypreid(preid string) *Presciption {
 	// db, err := leveldb.OpenFile("./db/Prescription.db", nil)
 	// defer db.Close()
