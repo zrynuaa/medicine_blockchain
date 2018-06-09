@@ -184,7 +184,7 @@
         var _this = this;
         _this.lines.pool = []
 
-  			$.post("http://"+window.location.host + "/",{},function(data,status){
+  			$.post("http://"+window.location.host + "/getprelist"+window.location.port,{},function(data,status){
   				if (status=="success") {
             console.log(data);
             var objs = eval(data)
