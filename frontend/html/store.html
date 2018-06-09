@@ -30,7 +30,7 @@
       <div class="tab-content">
         <div class="tab-pane fade margin-top-5 in active" id="Pool">
           <v-client-table :columns="columns.pool" :data="lines.pool" :options="options">
-              <div slot="Ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-on:click="handle(props.row)" v-bind:disabled="props.row.Ishandled!=0"><span class="glyphicon glyphicon-plus" v-show="props.row.Ishandled==0">接单</span><span class="glyphicon glyphicon-ok" v-show="props.row.Ishandled!=0"></span></button></div>
+              <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-on:click="handle(props.row)" v-bind:disabled="props.row.ishandled!=0"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==0">接单</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=0"></span></button></div>
           </v-client-table>
         </div>
         <div class="tab-pane fade margin-top-5" id="Pending">
@@ -99,10 +99,7 @@
           price: 0.00,
         },
         columns:{
-          pool:["Patient_id", "presciption_id", "medicine_name","amount","ts","site","price","Ishandled",],
-          pending:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
-          archive:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
-          closed:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
+          pool:["patient_id", "presciption_id", "medicine_name","amount","ts","site","price","ishandled",],
         },
         lines:{
           pool:[],
@@ -114,7 +111,7 @@
   				headings: {
   					xxx: "xxx", //
   				},
-  				sortable: ["Patient_id", "presciption_id", "medicine_name","amount","site","price","Ishandled",],
+  				sortable: ["patient_id", "presciption_id", "medicine_name","amount","site","price","ishandled",],
   				filterable: ["xxx"],
   			},
         pool_list:[],
@@ -158,31 +155,26 @@
   			var postData = {};
 
         console.log("aaaaaaaaa");
-        postData["Patient_id"] = row["Patient_id"]
-        postData.Data = {}
-        postData.Data.presciption_id = row["presciption_id"]
-        postData.Data.medicine_name = row["medicine_name"]
-        postData.Data.amount = row["amount"]
-        postData.Data.ts = row["ts"]
-        postData.Data.site = row["site"]
-        postData.Data.price = row["price"]
-        postData["Ishandled"] = 1
+        postData["patient_id"] = row["patient_id"]
+        postData.data = {}
+        postData.data.presciption_id = row["presciption_id"]
+        postData.data.medicine_name = row["medicine_name"]
+        postData.data.amount = row["amount"]
+        postData.data.ts = row["ts"]
+        postData.data.site = row["site"]
+        postData.data.price = row["price"]
+        postData["ishandled"] = 1
 
         console.log(postData);
-
-        // return
 
         $.ajax({
           type: 'POST',
           url: "http://"+window.location.host + "/sethandle1",
           data: JSON.stringify(postData),
           success: function(result){
-
-            console.log("bbbb");
-            console.log(result);
             if (result==200) {
                 console.log("xxxxxxx");
-                _this.lines.pool[row.key].Ishandled = 1
+                _this.lines.pool[row.key].ishandled = 1
             }
           },
           dataType: "json"
@@ -200,14 +192,14 @@
             $.each(objs, function(k,v){
                 var tmp = {}
                 tmp["key"] = k
-                tmp["Patient_id"] = v["Patient_id"]
-                tmp["presciption_id"] = v.Data.presciption_id
-                tmp["medicine_name"] = v.Data["medicine_name"]
-                tmp["amount"] = v.Data["amount"]
-                tmp["ts"] = v.Data["ts"]
-                tmp["site"] = v.Data["site"]
-                tmp["price"] = v.Data["price"]
-                tmp["Ishandled"] = v["Ishandled"]
+                tmp["patient_id"] = v.patient_id
+                tmp["presciption_id"] = v.data.presciption_id
+                tmp["medicine_name"] = v.data.medicine_name
+                tmp["amount"] = v.data.amount
+                tmp["ts"] = v.data.ts
+                tmp["site"] = v.data.site
+                tmp["price"] = v.data.price
+                tmp["ishandled"] = v.ishandled
 
                 _this.lines.pool.push(tmp)
             });

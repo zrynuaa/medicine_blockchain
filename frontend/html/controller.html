@@ -20,13 +20,103 @@
     <div class="container-fluid" id="master-page">
 
       <!-- main view -->
-      undefined
-      
+      <div class="row">
+        <div class="col-xs-12">
+          <v-client-table :columns="columns.prescription" :data="lines.prescription" :options="options">
+              <!-- <div slot="Ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-on:click="handle(props.row)" v-bind:disabled="props.row.Ishandled!=0"><span class="glyphicon glyphicon-plus" v-show="props.row.Ishandled==0">接单</span><span class="glyphicon glyphicon-ok" v-show="props.row.Ishandled!=0"></span></button></div> -->
+          </v-client-table>
+        </div>
+      </div>
+
     </div>
   </body>
 
   <!-- vue -->
   <script>
   Vue.use(VueTables.ClientTable);
+  var app = new Vue({
+  	el: '#master-page',
+  	data: function(){
+  		return {
+  			edit_flag: false,
+        columns:{
+          prescription:["key", "isbuy",  "hospital_id",  "patient_id",  "policy",  "presciption_id",  "ts",  "type",  "amount",  "chemistry_name",  "disease",  "doctor_id",],
+          pending:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
+          archive:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
+          closed:["Type", "Presciption_id", "Hospital_id","Patient_id","Ts","Data","Ishandled","Policy",],
+        },
+        options: {
+  				headings: {
+  					xxx: "xxx", //
+  				},
+  				sortable: ["key", "isbuy",  "hospital_id",  "patient_id",  "policy",  "presciption_id",  "ts",  "type",  "amount",  "chemistry_name",  "disease",  "doctor_id",],
+  				filterable: ["xxx"],
+  			},
+        lines:{
+          prescription:[],
+        },
+  		}
+  	},
+  	methods: {
+      getPrescription: function(){
+        var _this = this;
+        _this.lines.prescription = []
+        var postData = {}
+        postData["username"] = "*"
+
+  			$.post("http://"+window.location.host + "/getprescriptions",postData,function(data,status){
+  				if (status=="success") {
+            // console.log(data)
+            var objs = eval(data)
+            console.log(objs)
+            // return
+
+            $.each(objs, function(k,v){
+                var tmp = {}
+                tmp["key"] = k
+                tmp["isbuy"] = v["isbuy"]
+
+                tmp["hospital_id"] = v.data.hospital_id
+                tmp["patient_id"] = v.data.patient_id
+                tmp["policy"] = v.data.policy
+                tmp["presciption_id"] = v.data.presciption_id
+                tmp["ts"] = v.data.ts
+                tmp["type"] = v.data.type
+
+                tmp["amount"] = v.data.data.amount
+                tmp["chemistry_name"] = v.data.data.chemistry_name
+                tmp["disease"] = v.data.data.disease
+                tmp["doctor_id"] = v.data.data.doctor_id
+
+                _this.lines.prescription.push(tmp)
+            });
+  				}else{alert("Error!Code: "+status);}
+  			});
+      },
+      getTransactions: function(){
+        var _this = this;
+        _this.lines.prescription = []
+        var postData = {}
+        postData["username"] = "*"
+
+  			$.post("http://"+window.location.host + "/gettransactions",postData,function(data,status){
+  				if (status=="success") {
+            console.log(data)
+            var objs = eval(data)
+            console.log(objs)
+            return
+            // ###################  to be discussed
+
+  				}else{alert("Error!Code: "+status);}
+  			});
+      },
+  	},
+  	computed: {
+  	},
+  	created(){
+      this.getPrescription()
+      // this.getTransactions()
+  	}
+  });
   </script>
 </html>

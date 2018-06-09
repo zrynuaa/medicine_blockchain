@@ -57,7 +57,7 @@
             <span><input type="text" class="form-control" v-model="new_data.diagnose" placeholder="freetext"></input></span>
           </div>
         </div>
-        <div class="col-md-12 well">
+        <!-- <div class="col-md-12 well">
           <div class="col-xs-6">
             <span>prescription ID:: </span>
           </div>
@@ -65,14 +65,14 @@
             <span><input type="text" class="form-control" v-model="new_data.prescription_ID" placeholder="generate automated"></input></span>
           </div>
         </div>
-          <div class="col-md-12 well">
+        <div class="col-md-12 well">
           <div class="col-xs-6">
             <span>policy:: </span>
           </div>
           <div class="col-xs-6">
             <span><input type="text" class="form-control" v-model="new_data.policy" placeholder="xx"></input></span>
           </div>
-        </div>
+        </div> -->
         <div class="col-md-12 well">
           <div class="col-xs-6">
             <span>prescription content:: </span>
@@ -136,10 +136,10 @@
   		return {
   			edit_flag: false,
         new_data:{
-          hospital:"",
-          patient:"",
-          doctor:"",
-          diagnose:"",
+          hospital:"hid1",
+          patient:"pid1",
+          doctor:"did1",
+          diagnose:"fever",
           time:"",
           prescription_ID:"",
           prescription_content:[],
@@ -199,7 +199,7 @@
             "disease":this.new_data.diagnose,
             "chemistrys":this.new_data.prescription_content,
             // "policy":this.new_data.policy,
-            "policy":"Hid1 OR (Cid AND Rid1)",
+            "policy":"hid1 OR (Cid AND Rid1)",
         }
 
         $.ajax({
@@ -208,6 +208,7 @@
           data: JSON.stringify(postData),
           success: function(result){
             console.log(result);
+            alert("success")
             //code:: notice hospital the result.
           },
           dataType: "json"
