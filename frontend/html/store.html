@@ -76,6 +76,14 @@
     </div>
 
   </body>
+  <script>
+  //获取url中的参数
+  function getUrlParam(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+    var r = window.location.search.substr(1).match(reg); //匹配目标参数
+    if (r != null) return unescape(r[2]); return null; //返回参数值
+  }
+  </script>
 
   <!-- vue -->
   <script>
@@ -84,6 +92,7 @@
   	el: '#master-page',
   	data: function(){
   		return {
+        storeID: 1,
   			store: {
           name: "吉星大药房",
           sid: "10086",
@@ -153,8 +162,6 @@
   		handle: function(row){
   			var _this = this;
   			var postData = {};
-
-        console.log("aaaaaaaaa");
         postData["patient_id"] = row["patient_id"]
         postData.data = {}
         postData.data.presciption_id = row["presciption_id"]
@@ -166,10 +173,11 @@
         postData["ishandled"] = 1
 
         console.log(postData);
+        console.log("http://"+window.location.host + "/sethandle"+_this.storeID);
 
         $.ajax({
           type: 'POST',
-          url: "http://"+window.location.host + "/sethandle1",
+          url: "http://"+window.location.host + "/sethandle"+_this.storeID,
           data: JSON.stringify(postData),
           success: function(result){
             if (result==200) {
@@ -186,7 +194,8 @@
 
   			$.post("http://"+window.location.host + "/",{},function(data,status){
   				if (status=="success") {
-            console.log(data);
+            // console.log(data);
+            if (data==null||data==undefined) { return }
             var objs = eval(data)
 
             $.each(objs, function(k,v){
@@ -217,13 +226,34 @@
       getDrugList: function(){
         return 0
   		},
+      getPort: function(){
+        if (location.port=="8881") { this.storeID = 1  }
+        if (location.port=="8882") { this.storeID = 2  }
+  		},
+      checkStore: function(){
+        if (this.storeID==1) {
+          this.store = {
+            name: "吉星大药房",
+            sid: "10086",
+            type: 1,
+            site: "邯郸路220号",
+          }
+        }else{
+          this.store = {
+            name: "如意小药店",
+            sid: "10010",
+            type: 1,
+            site: "闵大荒",
+          }
+        }
+  		},
   	},
   	computed: {
   	},
   	created(){
+  		this.getPort();
+  		this.checkStore();
   		this.getPoolList();
-  		// this.fetch_person_info();
-  		// this.fetch_history_record();
   	}
   });
   </script>
