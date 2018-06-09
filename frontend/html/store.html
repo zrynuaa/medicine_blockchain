@@ -169,7 +169,7 @@
 
         $.ajax({
           type: 'POST',
-          url: "http://"+window.location.host + "/sethandle1",
+          url: "http://"+window.location.host + "/sethandle"+window.location.port,
           data: JSON.stringify(postData),
           success: function(result){
             if (result==200) {
