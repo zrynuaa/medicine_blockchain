@@ -21,9 +21,9 @@
     <div class="container-fluid margin-top-5" id="master-page">
       <!-- tab head -->
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#Presciption" data-toggle="tab" @click="getPrescription()"><h2>处方</h2></a></li>
-        <li><a href="#Transaction" data-toggle="tab" @click="getTransaction()"><h2>购物车</h2></a></li>
-        <li><a href="#Buys" data-toggle="tab" @click="getBuys()"><h2>购买历史</h2></a></li>
+        <li class="active"><a href="#Presciption" data-toggle="tab" @click=""><h2>处方</h2></a></li>
+        <!-- <li><a href="#Transaction" data-toggle="tab" @click=""><h2>购物车</h2></a></li> -->
+        <li><a href="#Buys" data-toggle="tab" @click=""><h2>购买历史</h2></a></li>
         <h1 class="pull-right">
           <select v-model="username" @change="changeUser()" class="form-control">
             <option value="*">终端</option>
@@ -35,7 +35,12 @@
       <div class="tab-content">
         <div class="tab-pane fade margin-top-5 in active" id="Presciption">
           <v-client-table :columns="columns.prescription" :data="lines.prescription" :options="options">
-              <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}}</div>
+              <div slot="chemistry_name" slot-scope="props">{{chemistry[props.row.chemistry_name]}}</div>
+              <div slot="detail" slot-scope="props">
+                  <button type="button" class="btn btn-info btn-block btn-md"
+                  @click="showDetail(lines.prescription_statistics[props.row.presciption_id], props.row)"
+                  :disabled="lines.prescription_statistics[props.row.presciption_id].tx_num<1"> 查看</button>
+              </div>
           </v-client-table>
         </div>
         <div class="tab-pane fade margin-top-5" id="Transaction">
@@ -44,9 +49,37 @@
           </v-client-table>
         </div>
         <div class="tab-pane fade margin-top-5" id="Buys">
+          <v-client-table :columns="columns.buy" :data="lines.buy" :options="options">
+              <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}}</div>
+          </v-client-table>
         </div>
       </div>
-      </div>
+
+      <!-- modal -->
+      <div class="modal fade" tabindex="-1" role="dialog" id="BUY_MODAL">
+        <div class="modal-dialog" role="document" style="width:66%;">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">Buy Medicine - {{buy_modal.name}}</h4>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <v-client-table :columns="columns.tx" :data="buy_modal.lines" :options="options">
+                      <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div>
+                      <div slot="buy" slot-scope="props"><button class="btn btn-success btn-md btn-block" @click="buy(props.row, $event)" :disabled="props.row.ishandled>1">choooose this</button></div>
+                  </v-client-table>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer margin-top-5">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <!-- <button type="button" class="btn btn-primary" @click="addDrug()" :disabled="new_drug.name==''||new_drug.qty<1">Finish</button> -->
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
 
     </div>
   </body>
@@ -65,9 +98,10 @@
       			username: "*",
       			edit_flag: false,
             columns:{
-              prescription:["key", "isbuy",  "hospital_id",  "patient_id",  "policy",  "presciption_id",  "_ts",  "type",  "amount",  "chemistry_name",  "disease",  "doctor_id",],
+              prescription:["key", "isbuy",  "hospital_id",  "patient_id",  "policy",  "presciption_id",  "_ts",  "type",  "amount",  "chemistry_name",  "disease",  "doctor_id", "detail",],
               transaction:["key", "patient_id",  "ishandled",  "amount",  "medicine_name",  "presciption_id",  "price",  "site",  "_ts",],
-              buy:["key", "isbuy",  "hospital_id",  "patient_id",  "policy",  "presciption_id",  "_ts",  "type",  "amount",  "chemistry_name",  "disease",  "doctor_id",],
+              tx:["key", "patient_id",  "ishandled",  "amount",  "medicine_name",  "presciption_id",  "price",  "site",  "_ts", "buy",],
+              buy:["key", "patient_id",  "type",  "medicine_amount",  "medicine_name",  "medicine_price",  "presciption_id",  "site",  "_ts",],
             },
             options: {
       				headings: {
@@ -80,6 +114,14 @@
               prescription:[],
               transaction:[],
               buy:[],
+              prescription_statistics:{},
+            },
+            buy_modal:{
+              lines:[],
+              num:0,
+              name:"",
+              pre_info:{},
+              choose:-1,
             },
       		}
       	},
@@ -89,7 +131,7 @@
             _this.lines.prescription = []
             var postData = {}
             postData["username"] = _this.username
-
+            $.ajaxSetup({async: false});
       			$.post("http://"+window.location.host + "/getprescriptions",postData,function(data,status){
       				if (status=="success") {
                 var objs = eval(data)
@@ -116,7 +158,12 @@
                     tmp["_ts"] = (new Date(v.data.ts*1000)).toLocaleString()
 
                     _this.lines.prescription.push(tmp)
+                    _this.lines.prescription_statistics[tmp["presciption_id"]] = {
+                      tx_num: 0,
+                      tx:[],
+                    }
                 });
+                $.ajaxSetup({async: true});
       				}else{alert("Error!Code: "+status);}
       			});
           },
@@ -125,6 +172,7 @@
             _this.lines.transaction = []
             var postData = {}
             postData["username"] = _this.username
+            // $.ajaxSetup({async: false});
 
       			$.post("http://"+window.location.host + "/gettransactions",postData,function(data,status){
       				if (status=="success") {
@@ -149,14 +197,17 @@
                     tmp["_ts"] = (new Date(v.data.ts*1000)).toLocaleString()
 
                     _this.lines.transaction.push(tmp)
-                });
 
+                    _this.lines.prescription_statistics[tmp["presciption_id"]].tx.push(tmp)
+                    _this.lines.prescription_statistics[tmp["presciption_id"]].tx_num++
+                });
+                // $.ajaxSetup({async: true});
       				}else{alert("Error!Code: "+status);}
       			});
           },
           getBuys: function(){
             var _this = this;
-            _this.lines.transaction = []
+            _this.lines.buy = []
             var postData = {}
             postData["username"] = _this.username
 
@@ -165,22 +216,27 @@
                 var objs = eval(data)
                 if (objs==null) {return}
                 console.log(objs)
-                return
+                // return
                 // ###################  to be discussed
                 $.each(objs, function(k,v){
                     var tmp = {}
                     tmp["key"] = k
                     tmp["patient_id"] = v.patient_id
-                    tmp["ishandled"] = v.ishandled
+                    tmp["type"] = v.type
 
-                    tmp["amount"] = v.data.amount
+                    tmp["medicine_amount"] = v.data.medicine_amount
                     tmp["medicine_name"] = v.data.medicine_name
+                    tmp["medicine_price"] = v.data.medicine_price
                     tmp["presciption_id"] = v.data.presciption_id
-                    tmp["price"] = v.data.price
                     tmp["site"] = v.data.site
                     tmp["ts"] = v.data.ts
 
-                    _this.lines.transaction.push(tmp)
+                    tmp["_ts"] = (new Date(v.data.ts*1000)).toLocaleString()
+
+                    _this.lines.buy.push(tmp)
+
+                    // _this.lines.prescription_statistics[tmp["presciption_id"]].tx.push(tmp)
+                    // _this.lines.prescription_statistics[tmp["presciption_id"]].tx_num++
                 });
 
       				}else{alert("Error!Code: "+status);}
@@ -216,7 +272,18 @@
               dataType: "json"
             });
           },
+          showDetail: function(tx_info, pre_info){
+
+              this.buy_modal.lines = tx_info.tx
+              this.buy_modal.num = tx_info.tx_num
+              this.buy_modal.pre_info = pre_info
+              this.buy_modal.name = this.chemistry[pre_info.chemistry_name]
+
+              console.log(this.buy_modal)
+              $("#BUY_MODAL").modal("show")
+          },
           changeUser: function(){
+            this.prescription_statistics = {}
             this.getPrescription()
             this.getTransaction()
             this.getBuys()
