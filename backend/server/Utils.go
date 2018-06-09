@@ -37,6 +37,7 @@ func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 		//policy := pre.Policy
 		//fmt.Println(pre.Policy)
 		policy := strings.Replace(pre.Policy,"Cid",pre.Chemistrys[i].Chemistry_name, -1)
+		policy = strings.Replace(policy,"Rid","rid", -1)
 		ptot.Policy = policy
 		//fmt.Println(policy)
 
