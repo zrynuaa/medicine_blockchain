@@ -35,8 +35,10 @@ func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 		ptot.Data.Chemistry_name = pre.Chemistrys[i].Chemistry_name
 		ptot.Data.Amount = pre.Chemistrys[i].Amount
 		//policy := pre.Policy
-		policy := strings.Replace(pre.Policy,"cid",pre.Chemistrys[i].Chemistry_name, -1)
+		//fmt.Println(pre.Policy)
+		policy := strings.Replace(pre.Policy,"Cid",pre.Chemistrys[i].Chemistry_name, -1)
 		ptot.Policy = policy
+		//fmt.Println(policy)
 
 		if i>0{
 			easypreid = easypreid[:len(easypreid)-2]
