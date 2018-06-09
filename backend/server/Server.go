@@ -48,7 +48,8 @@ func GetPrescriptions(w http.ResponseWriter, r *http.Request)  {
 }
 
 func GetTransactions(w http.ResponseWriter, r *http.Request) {
-	trans,_ := GetreadyInfo("Transaction", r.FormValue("username"))
+	// trans,_ := GetreadyInfo("Transaction", r.FormValue("username"))
+	_,trans := GetreadyInfo("Transaction", r.FormValue("username"))
 	json.NewEncoder(w).Encode(trans)
 }
 
@@ -99,6 +100,3 @@ func Run()  {
 
 	<-finish
 }
-
-
-
