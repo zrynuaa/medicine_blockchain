@@ -27,3 +27,17 @@ var chemistry = {
   "cid11":"氧氟沙星",
   "cid12":"头孢克洛",
 }
+
+var hospital = {
+  "hid1":"中医院",
+}
+
+var store = {
+  "store1":"吉星大药房",
+  "store2":"如意小药店",
+}
+
+var patient = {
+  "patientid1":"病人A",
+  "patientid2":"病人B",
+}
