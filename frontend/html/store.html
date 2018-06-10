@@ -37,12 +37,16 @@
         <div class="tab-pane fade margin-top-5" id="Pending">
           <v-client-table :columns="columns.pending" :data="lines.pending" :options="options">
               <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div>
-              <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-bind:disabled="props.row.ishandled!=1"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==1"> 成交</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=1"></span></button></div>
+              <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-bind:disabled="props.row.ishandled==3"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==3"> 抢到</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=3"></span></button></div>
           </v-client-table>
         </div>
         <div class="tab-pane fade margin-top-5" id="Archive">
         </div>
         <div class="tab-pane fade margin-top-5" id="Closed">
+            <v-client-table :columns="columns.closed" :data="lines.closed" :options="options">
+                <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div>
+                <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-bind:disabled="props.row.ishandled!=1"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==2"> 被抢</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=2"></span></button></div>
+            </v-client-table>
         </div>
       </div>
 
@@ -110,6 +114,7 @@
         columns:{
           pool:["patient_id", "presciption_id", "medicine_name","amount","_ts","site","price","ishandled",],
           pending:["patient_id", "presciption_id", "medicine_name","amount","_ts","site","price","ishandled",],
+          closed:["patient_id", "presciption_id", "medicine_name","amount","_ts","site","price","ishandled",],
         },
         lines:{
           pool:[],
@@ -193,6 +198,7 @@
         var _this = this;
         _this.lines.pool = []
         _this.lines.pending = []
+        _this.lines.closed = []
 
   			$.post("http://"+window.location.host + "/getprelist"+window.location.port,{},function(data,status){
   				if (status=="success") {
@@ -202,6 +208,7 @@
 
             var cnt_pending = 0
             var cnt_pool = 0
+            var cnt_closed = 0
             $.each(objs, function(k,v){
                 var tmp = {}
                 tmp["patient_id"] = v.patient_id
@@ -217,9 +224,12 @@
                 if (v.ishandled==3) {
                   tmp["key"] = cnt_pending++
                   _this.lines.pending.push(tmp)
-                }else{
+                }else if (v.ishandled<2){
                   tmp["key"] = cnt_pool++
                   _this.lines.pool.push(tmp)
+                }else if (v.ishandled==2){
+                  tmp["key"] = cnt_closed++
+                  _this.lines.closed.push(tmp)
                 }
             });
   				}else{alert("Error!Code: "+status);}
