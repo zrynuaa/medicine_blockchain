@@ -12,8 +12,32 @@ import (
 	"strings"
 )
 
+func AddDoses()  {
+	//设置化学名与药品对应关系
+	d1 := based.Dose{Medicine_name:"mid1", Chemistry_name:"cid1", Medicine_amount:2, Medicine_price:1.2}
+	d2 := based.Dose{Medicine_name:"mid2", Chemistry_name:"cid2", Medicine_amount:1, Medicine_price:2.2}
+	d3 := based.Dose{Medicine_name:"mid3", Chemistry_name:"cid2", Medicine_amount:3, Medicine_price:0.9}
+	d4 := based.Dose{Medicine_name:"mid4", Chemistry_name:"cid3", Medicine_amount:2, Medicine_price:1.5}
+	d5 := based.Dose{Medicine_name:"mid5", Chemistry_name:"cid4", Medicine_amount:4, Medicine_price:0.78}
+	d6 := based.Dose{Medicine_name:"mid6", Chemistry_name:"cid4", Medicine_amount:2, Medicine_price:1.2}
+	d7 := based.Dose{Medicine_name:"mid7", Chemistry_name:"cid4", Medicine_amount:7, Medicine_price:1.6}
+	d8 := based.Dose{Medicine_name:"mid8", Chemistry_name:"cid5", Medicine_amount:10, Medicine_price:1.8}
+	d9 := based.Dose{Medicine_name:"mid9", Chemistry_name:"cid6", Medicine_amount:5, Medicine_price:2.5}
+	d10 := based.Dose{Medicine_name:"mid10", Chemistry_name:"cid7", Medicine_amount:6, Medicine_price:3.9}
+	d11 := based.Dose{Medicine_name:"mid11", Chemistry_name:"cid7", Medicine_amount:2, Medicine_price:0.9}
+	d12 := based.Dose{Medicine_name:"mid12", Chemistry_name:"cid7", Medicine_amount:1, Medicine_price:3.7}
+
+	var dose []based.Dose
+	dose = append(dose, d1, d2, d3, d4, d5, d6,d7,d8,d9,d10,d11,d12)
+	for _,v := range dose {
+		based.PutDose(v)
+	}
+}
+
 //医院发布处方信息
 func PrescriptiontoTransaction(pre HospitalPrescription) bool {
+
+	prePolicy := "hid1 OR (cid AND rid1)"
 
 	var ptot based.Presciption
 	ptot.Type = 0
@@ -36,8 +60,8 @@ func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 		ptot.Data.Amount = pre.Chemistrys[i].Amount
 		//policy := pre.Policy
 		//fmt.Println(pre.Policy)
-		policy := strings.Replace(pre.Policy,"Cid",pre.Chemistrys[i].Chemistry_name, -1)
-		policy = strings.Replace(policy,"Rid","rid", -1)
+		policy := strings.Replace(prePolicy,"cid",pre.Chemistrys[i].Chemistry_name, -1)
+		//policy = strings.Replace(policy,"rid","rid", -1)
 		ptot.Policy = policy
 		//fmt.Println(policy)
 
