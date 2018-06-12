@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Block Info</title>
+    <script src="../static/js/jquery.min.js" charset="utf-8"></script>
+    <script src="../static/js/bootstrap.min.js" charset="utf-8"></script>
+    <script src="../static/vue/vue.min.js"></script>
+    <script src="../static/vue/vue-tables-2.min.js"></script>
+
+
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+
+    <style media="screen">
+      .margin-top-5{margin-top: 5px;}
+    </style>
+
+  </head>
+  <body>
+    <div class="container-fluid" id="master-page">
+        <div class="row">
+          <div class=" col-xs-12">
+            <v-client-table :columns="columns.closed" :data="lines.block" :options="options">
+                <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div>
+                <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-bind:disabled="props.row.ishandled!=1"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==2"> 被抢</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=2"></span></button></div>
+            </v-client-table>
+          </div>
+        </div>
+    </div>
+  </body>
+
+  <!-- vue -->
+  <script>
+  Vue.use(VueTables.ClientTable);
+  var app = new Vue({
+  	el: '#master-page',
+  	data: function(){
+  		return {
+        columns:{
+          block:["patient_id", "presciption_id", "medicine_name","amount","_ts","site","price","ishandled",],
+        },
+        lines:{
+          block:[],
+        },
+        options: {
+  				headings: {
+  					xxx: "xxx", //
+  				},
+  				sortable: ["patient_id", "presciption_id", "medicine_name","amount","site","price","ishandled","ts",],
+  				filterable: ["xxx"],
+  			},
+  		}
+  	},
+  	methods: {
+      getPoolList: function(){
+        var _this = this;
+        _this.lines.block = []
+
+  			$.post("http://"+window.location.host + "/getblockchain"+window.location.port,{},function(data,status){
+  				if (status=="success") {
+            var objs = eval(data)
+            console.log(objs);
+            return ;
+            if (objs==null) {return}
+
+            var cnt_pending = 0
+            var cnt_pool = 0
+            var cnt_closed = 0
+            $.each(objs, function(k,v){
+                var tmp = {}
+                tmp["patient_id"] = v.patient_id
+                tmp["presciption_id"] = v.data.presciption_id
+                tmp["medicine_name"] = v.data.medicine_name
+                tmp["amount"] = v.data.amount
+                tmp["_ts"] = (new Date(v.data.ts*1000)).toLocaleString()
+                tmp["ts"] = v.data.ts
+                tmp["site"] = v.data.site
+                tmp["price"] = v.data.price
+                tmp["ishandled"] = v.ishandled
+            });
+  				}else{alert("Error!Code: "+status);}
+  			});
+
+        return 0
+  		},
+  	},
+  	computed: {
+  	},
+  	created(){
+  		// this.getPort();
+  		// this.checkStore();
+  		// this.getPoolList();
+  	}
+  });
+  </script>
+</html>

@@ -102,7 +102,7 @@ func Run()  {
 	server8883.HandleFunc("/userbuymedicine", UserbuyMedicine)
 
 	server8884 := http.NewServeMux()
-	AddHandletoServer(server8884, "blockchain.html")
+	AddHandletoServer(server8884, "blockExplore.html")
 	server8880.HandleFunc("/getblockchain", GetBlockchain)
 
 	go http.ListenAndServe(":8880", server8880)
