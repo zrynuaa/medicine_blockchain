@@ -60,6 +60,12 @@ type Buy struct {
 	Patient_id string `json:"patient_id"`
 }
 
+type Block struct {
+	PrevHash []byte `json:"prev_hash"`
+	Height int `json:"height"`
+	DataHash []byte `json:"data_hash"`
+}
+
 //存储的处方结构，data部分可能将来加密
 //在serial的时候加密，一样返回[]byte
 type presciption struct {
@@ -286,6 +292,30 @@ func deserializeBuy(d []byte) *Buy {
 	dp.Data = deserializeDatabuy(dptemp.Data_buy)
 	dp.Patient_id = dptemp.Patient_id
 	dp.Type = dptemp.Type
+
+	return dp
+}
+
+func (b *Block)serialize() []byte {
+	var result bytes.Buffer
+
+	encoder := gob.NewEncoder(&result)
+	err := encoder.Encode(b)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return result.Bytes()
+}
+
+func deserializeBlock(d []byte) *Block {
+	dp := new(Block)
+
+	decoder := gob.NewDecoder(bytes.NewReader(d))
+	err := decoder.Decode(&dp)
+	if err != nil {
+		log.Panic(err)
+	}
 
 	return dp
 }

@@ -5,12 +5,14 @@ import (
 	"strconv"
 	"strings"
 	//"fmt"
+	"fmt"
 )
 var Sdb_Pre, _ = leveldb.OpenFile("./db/Prescription.db", nil)
 var Sdb_Map, _ = leveldb.OpenFile("./db/Mapping.db", nil)
 var Sdb_TX, _ 	= leveldb.OpenFile("./db/Transaction.db", nil)
 var Sdb_Buy, _ 	= leveldb.OpenFile("./db/Buy.db", nil)
 var Sdb_Dose, _ 	= leveldb.OpenFile("./db/Dose.db", nil)
+var Sdb_Block, _ = leveldb.OpenFile("./db/Block.db", nil)
 
 //存储处方，输入一个处方
 func PutPrescription(a Presciption) {
@@ -572,4 +574,33 @@ func IsBuy(presciption_id string, site string, medicine_name string) bool {
 	}
 	return false
 
+}
+
+//Block结构
+func PutBlock(a Block){
+	aserial := a.serialize()
+	err := Sdb_Block.Put([]byte(strconv.Itoa(a.Height)), aserial, nil)
+	if err != nil {
+		return
+	}
+	//fmt.Println("BlockInfo::")
+	//fmt.Println("  Height::", a.Height)
+	//fmt.Printf("  PrevHash::%x\n", a.PrevHash)
+	//fmt.Printf("  DataHash::%x\n", a.DataHash)
+}
+
+//获得block
+func GetBlock() []*Block{
+	var result = []*Block{}
+	iter := Sdb_Block.NewIterator(nil, nil)
+	for iter.Next() {
+		value := deserializeBlock(iter.Value())
+		result = append(result, value)
+	}
+	iter.Release()
+	err := iter.Error()
+	if err != nil {
+		return nil
+	}
+	return result
 }
