@@ -39,16 +39,16 @@
   	data: function(){
   		return {
         columns:{
-          block:["height", "prev_hash", "data_hash","ts","_ts"],
+          block:["height", "prev_hash", "this_hash", "data_hash","ts","_ts"],
         },
         lines:{
           block:[],
         },
         options: {
   				headings: {
-  					xxx: "xxx", //
+  					height: "区块高度", //
   				},
-  				sortable: ["height", "prev_hash", "data_hash","ts","_ts",],
+  				sortable: ["height", "prev_hash", "this_hash", "data_hash","ts","_ts",],
   				filterable: ["xxx"],
   			},
   		}
@@ -70,6 +70,7 @@
                 tmp["height"] = v.height
                 tmp["prev_hash"] = v.prev_hash
                 tmp["data_hash"] = v.data_hash
+                tmp["this_hash"] = v.this_hash
                 tmp["_ts"] = (new Date(v.ts*1000)).toLocaleString()
                 tmp["ts"] = v.ts
 
