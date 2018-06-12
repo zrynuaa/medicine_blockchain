@@ -66,6 +66,10 @@ func UserbuyMedicine(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w,http.StatusOK)
 }
 
+func GetBlockchain(w http.ResponseWriter, r *http.Request)  {
+	json.NewEncoder(w).Encode(based.GetBlock())
+}
+
 func Run()  {
 	if amount,_ := based.GetDosedata("mid1", "cid1", 1); amount == 0 {
 		AddDoses() //初始化化学名与药品对应关系以及药品价格
@@ -97,10 +101,15 @@ func Run()  {
 	server8883.HandleFunc("/getbuys", GetBuys)
 	server8883.HandleFunc("/userbuymedicine", UserbuyMedicine)
 
+	server8884 := http.NewServeMux()
+	AddHandletoServer(server8884, "blockchain.html")
+	server8880.HandleFunc("/getblockchain", GetBlockchain)
+
 	go http.ListenAndServe(":8880", server8880)
 	go http.ListenAndServe(":8881", server8881)
 	go http.ListenAndServe(":8882", server8882)
 	go http.ListenAndServe(":8883", server8883)
+	go http.ListenAndServe(":8883", server8884)
 
 	<-finish
 }

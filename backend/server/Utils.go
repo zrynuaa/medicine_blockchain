@@ -3,13 +3,14 @@ package server
 import (
 	"github.com/scottocs/medicine_blockchain/backend/based"
 	"encoding/json"
-	"crypto/md5"
+	//"crypto/md5"
 	"fmt"
 	"time"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+	"github.com/Doresimon/SM-Collection/SM3"
 )
 
 func AddDoses()  {
@@ -52,7 +53,8 @@ func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 
 	//生成处方ID
 	buf,_ := json.Marshal(ptot)
-	digest := md5.Sum(buf)
+	//digest := md5.Sum(buf)
+	digest := SM3.SM3_256(buf)
 	easypreid := fmt.Sprintf("%x", digest)
 
 	for i:=0; i<num ;i++{
