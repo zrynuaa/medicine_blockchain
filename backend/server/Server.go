@@ -67,6 +67,10 @@ func UserbuyMedicine(w http.ResponseWriter, r *http.Request) {
 }
 
 func Run()  {
+	if amount,_ := based.GetDosedata("mid1", "cid1", 1); amount == 0 {
+		AddDoses() //初始化化学名与药品对应关系以及药品价格
+	}
+
 	finish := make(chan bool)
 
 	server8880 := http.NewServeMux()

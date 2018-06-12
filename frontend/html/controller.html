@@ -36,6 +36,8 @@
         <div class="tab-pane fade margin-top-5 in active" id="Presciption">
           <v-client-table :columns="columns.prescription" :data="lines.prescription" :options="options">
               <div slot="chemistry_name" slot-scope="props">{{chemistry[props.row.chemistry_name]}}</div>
+              <div slot="patient_id" slot-scope="props">{{patient[props.row.patient_id]}}</div>
+              <div slot="hospital_id" slot-scope="props">{{hospital[props.row.hospital_id]}}</div>
               <div slot="detail" slot-scope="props">
                   <button type="button" class="btn btn-info btn-block btn-md"
                   @click="showDetail(lines.prescription_statistics[props.row.presciption_id], props.row)"
@@ -46,11 +48,13 @@
         <div class="tab-pane fade margin-top-5" id="Transaction">
           <v-client-table :columns="columns.transaction" :data="lines.transaction" :options="options">
               <div slot="chemistry_name" slot-scope="props">{{chemistry[props.row.chemistry_name]}}</div>
+              <div slot="patient_id" slot-scope="props">{{patient[props.row.patient_id]}}</div>
           </v-client-table>
         </div>
         <div class="tab-pane fade margin-top-5" id="Buys">
           <v-client-table :columns="columns.buy" :data="lines.buy" :options="options">
               <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}}</div>
+              <div slot="patient_id" slot-scope="props">{{patient[props.row.patient_id]}}</div>
           </v-client-table>
         </div>
       </div>
@@ -68,6 +72,7 @@
                 <div class="col-md-12">
                   <v-client-table :columns="columns.tx" :data="buy_modal.lines" :options="options">
                       <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div>
+                      <div slot="patient_id" slot-scope="props">{{patient[props.row.patient_id]}}</div>
                       <div slot="buy" slot-scope="props"><button class="btn btn-success btn-md btn-block" @click="buy(props.row, $event)" :disabled="props.row.ishandled>1">choooose this</button></div>
                   </v-client-table>
                 </div>
@@ -95,6 +100,8 @@
       		return {
       			medicine: medicine,
       			chemistry: chemistry,
+      			patient: patient,
+      			hospital: hospital,
       			username: "*",
       			edit_flag: false,
             columns:{
