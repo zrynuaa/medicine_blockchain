@@ -13,6 +13,7 @@ var drugstore3 Drugstore
 
 
 func HospitalSendPrescription(w http.ResponseWriter, r *http.Request)  {
+w.Header().Set("Access-Control-Allow-Origin", "*")
 	var pre HospitalPrescription
 	json.NewDecoder(r.Body).Decode(&pre)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -23,18 +24,21 @@ func HospitalSendPrescription(w http.ResponseWriter, r *http.Request)  {
 }
 
 func Store1getMInfo(w http.ResponseWriter, r *http.Request)  {
+w.Header().Set("Access-Control-Allow-Origin", "*")
 	var trans []Transaction
 	trans = StoregetMInfo(drugstore1)
 	json.NewEncoder(w).Encode(trans)
 }
 
 func Store2getMInfo(w http.ResponseWriter, r *http.Request)  {
+w.Header().Set("Access-Control-Allow-Origin", "*")
 	var trans []Transaction
 	trans = StoregetMInfo(drugstore2)
 	json.NewEncoder(w).Encode(trans)
 }
 
 func Store3getMInfo(w http.ResponseWriter, r *http.Request)  {
+w.Header().Set("Access-Control-Allow-Origin", "*")
 	var trans []Transaction
 	trans = StoregetMInfo(drugstore3)
 	json.NewEncoder(w).Encode(trans)
@@ -50,17 +54,20 @@ func Sethandle(w http.ResponseWriter, r *http.Request)  {
 }
 
 func GetPrescriptions(w http.ResponseWriter, r *http.Request)  {
+w.Header().Set("Access-Control-Allow-Origin", "*")
 	pres,_ := GetreadyInfo("Prescription", r.FormValue("username"))
 	json.NewEncoder(w).Encode(pres)
 }
 
 func GetTransactions(w http.ResponseWriter, r *http.Request) {
+w.Header().Set("Access-Control-Allow-Origin", "*")
 	// trans,_ := GetreadyInfo("Transaction", r.FormValue("username"))
 	_,trans := GetreadyInfo("Transaction", r.FormValue("username"))
 	json.NewEncoder(w).Encode(trans)
 }
 
 func GetBuys(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(based.GetBuyByid(r.FormValue("username")))
 }
 
@@ -74,6 +81,7 @@ func UserbuyMedicine(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetBlockchain(w http.ResponseWriter, r *http.Request)  {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(based.GetBlock())
 }
 
