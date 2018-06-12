@@ -9,6 +9,7 @@ import (
 
 var drugstore1 Drugstore
 var drugstore2 Drugstore
+var drugstore3 Drugstore
 
 
 func HospitalSendPrescription(w http.ResponseWriter, r *http.Request)  {
@@ -30,6 +31,12 @@ func Store1getMInfo(w http.ResponseWriter, r *http.Request)  {
 func Store2getMInfo(w http.ResponseWriter, r *http.Request)  {
 	var trans []Transaction
 	trans = StoregetMInfo(drugstore2)
+	json.NewEncoder(w).Encode(trans)
+}
+
+func Store3getMInfo(w http.ResponseWriter, r *http.Request)  {
+	var trans []Transaction
+	trans = StoregetMInfo(drugstore3)
 	json.NewEncoder(w).Encode(trans)
 }
 
@@ -94,22 +101,28 @@ func Run()  {
 	server8882.HandleFunc("/sethandle8882", Sethandle)
 
 	server8883 := http.NewServeMux()
-	AddHandletoServer(server8883, "controller.html")
-	//server8883.HandleFunc("/", Supervision)
-	server8883.HandleFunc("/getprescriptions", GetPrescriptions)
-	server8883.HandleFunc("/gettransactions", GetTransactions)
-	server8883.HandleFunc("/getbuys", GetBuys)
-	server8883.HandleFunc("/userbuymedicine", UserbuyMedicine)
+	AddHandletoServer(server8883, "store.html")
+	drugstore3 = SetStore3Attrs()
+	server8883.HandleFunc("/getprelist8883", Store3getMInfo)
+	server8883.HandleFunc("/sethandle8883", Sethandle)
 
 	server8884 := http.NewServeMux()
-	AddHandletoServer(server8884, "blockExplore.html")
-	server8880.HandleFunc("/getblockchain", GetBlockchain)
+	AddHandletoServer(server8884, "controller.html")
+	server8884.HandleFunc("/getprescriptions", GetPrescriptions)
+	server8884.HandleFunc("/gettransactions", GetTransactions)
+	server8884.HandleFunc("/getbuys", GetBuys)
+	server8884.HandleFunc("/userbuymedicine", UserbuyMedicine)
+
+	server8885 := http.NewServeMux()
+	AddHandletoServer(server8885, "blockExplore.html")
+	server8885.HandleFunc("/getblockchain", GetBlockchain)
 
 	go http.ListenAndServe(":8880", server8880)
 	go http.ListenAndServe(":8881", server8881)
 	go http.ListenAndServe(":8882", server8882)
 	go http.ListenAndServe(":8883", server8883)
-	go http.ListenAndServe(":8883", server8884)
+	go http.ListenAndServe(":8884", server8884)
+	go http.ListenAndServe(":8885", server8885)
 
 	<-finish
 }
