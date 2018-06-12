@@ -135,6 +135,9 @@
   <script src="../static/info/map.js" charset="utf-8"></script>
   <!-- vue -->
   <script>
+  // var ServerIP = window.location.host
+  var ServerIP = "192.168.43.115"
+
   Vue.use(VueTables.ClientTable);
   var app = new Vue({
   	el: '#master-page',
@@ -211,7 +214,7 @@
 
         $.ajax({
           type: 'POST',
-          url: "http://"+window.location.host + "/hospitalsendprescription",
+          url: "http://" + ServerIP + "/hospitalsendprescription",
           data: JSON.stringify(postData),
           success: function(result){
             console.log(result);

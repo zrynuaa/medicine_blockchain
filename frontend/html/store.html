@@ -90,6 +90,10 @@
   <script src="../static/info/map.js" charset="utf-8"></script>
   <!-- vue -->
   <script>
+
+  // var ServerIP = window.location.host
+  var ServerIP = "192.168.43.115"
+
   Vue.use(VueTables.ClientTable);
   var app = new Vue({
   	el: '#master-page',
@@ -179,11 +183,11 @@
         postData["ishandled"] = 1
 
         console.log(postData);
-        console.log("http://"+window.location.host + "/sethandle"+_this.storeID);
+        console.log("http://"+ ServerIP + "/sethandle"+_this.storeID);
 
         $.ajax({
           type: 'POST',
-          url: "http://"+window.location.host + "/sethandle"+window.location.port,
+          url: "http://"+ ServerIP + "/sethandle"+window.location.port,
           data: JSON.stringify(postData),
           success: function(result){
             if (result==200) {
@@ -200,7 +204,7 @@
         _this.lines.pending = []
         _this.lines.closed = []
 
-  			$.post("http://"+window.location.host + "/getprelist"+window.location.port,{},function(data,status){
+  			$.post("http://"+ ServerIP + "/getprelist"+window.location.port,{},function(data,status){
   				if (status=="success") {
             var objs = eval(data)
             console.log(objs);

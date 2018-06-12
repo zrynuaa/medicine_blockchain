@@ -93,6 +93,8 @@
   <script src="../static/info/map.js" charset="utf-8"></script>
   <!-- vue -->
   <script>
+      // var ServerIP = window.location.host
+      var ServerIP = "192.168.43.115"
       Vue.use(VueTables.ClientTable);
       var app = new Vue({
       	el: '#master-page',
@@ -139,7 +141,7 @@
             var postData = {}
             postData["username"] = _this.username
             $.ajaxSetup({async: false});
-      			$.post("http://"+window.location.host + "/getprescriptions",postData,function(data,status){
+      			$.post("http://"+ ServerIP + "/getprescriptions",postData,function(data,status){
       				if (status=="success") {
                 var objs = eval(data)
                 if (objs==null) {return}
@@ -181,7 +183,7 @@
             postData["username"] = _this.username
             // $.ajaxSetup({async: false});
 
-      			$.post("http://"+window.location.host + "/gettransactions",postData,function(data,status){
+      			$.post("http://"+ ServerIP + "/gettransactions",postData,function(data,status){
       				if (status=="success") {
                 var objs = eval(data)
                 if (objs==null) {return}
@@ -218,7 +220,7 @@
             var postData = {}
             postData["username"] = _this.username
 
-      			$.post("http://"+window.location.host + "/getbuys",postData,function(data,status){
+      			$.post("http://"+ ServerIP + "/getbuys",postData,function(data,status){
       				if (status=="success") {
                 var objs = eval(data)
                 if (objs==null) {return}
@@ -269,7 +271,7 @@
 
             $.ajax({
               type: 'POST',
-              url: "http://"+window.location.host + "/userbuymedicine",
+              url: "http://"+ ServerIP + "/userbuymedicine",
               data: JSON.stringify(postData),
               success: function(result){
                   console.log(result);

@@ -20,9 +20,9 @@
     <div class="container-fluid" id="master-page">
         <div class="row">
           <div class=" col-xs-12">
-            <v-client-table :columns="columns.closed" :data="lines.block" :options="options">
-                <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div>
-                <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-bind:disabled="props.row.ishandled!=1"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==2"> 被抢</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=2"></span></button></div>
+            <v-client-table :columns="columns.block" :data="lines.block" :options="options">
+                <!-- <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div> -->
+                <!-- <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-bind:disabled="props.row.ishandled!=1"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==2"> 被抢</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=2"></span></button></div> -->
             </v-client-table>
           </div>
         </div>
@@ -31,13 +31,15 @@
 
   <!-- vue -->
   <script>
+  // var ServerIP = window.location.host
+  var ServerIP = "192.168.43.115"
   Vue.use(VueTables.ClientTable);
   var app = new Vue({
   	el: '#master-page',
   	data: function(){
   		return {
         columns:{
-          block:["patient_id", "presciption_id", "medicine_name","amount","_ts","site","price","ishandled",],
+          block:["height", "prev_hash", "data_hash","ts","_ts"],
         },
         lines:{
           block:[],
@@ -52,31 +54,26 @@
   		}
   	},
   	methods: {
-      getPoolList: function(){
+      getBlocks: function(){
         var _this = this;
         _this.lines.block = []
 
-  			$.post("http://"+window.location.host + "/getblockchain"+window.location.port,{},function(data,status){
+  			$.post("http://"+ ServerIP + "/getblockchain",{},function(data,status){
   				if (status=="success") {
             var objs = eval(data)
             console.log(objs);
-            return ;
             if (objs==null) {return}
 
-            var cnt_pending = 0
-            var cnt_pool = 0
-            var cnt_closed = 0
+            ["height", "prev_hash", "data_hash","ts","_ts"]
             $.each(objs, function(k,v){
                 var tmp = {}
-                tmp["patient_id"] = v.patient_id
-                tmp["presciption_id"] = v.data.presciption_id
-                tmp["medicine_name"] = v.data.medicine_name
-                tmp["amount"] = v.data.amount
-                tmp["_ts"] = (new Date(v.data.ts*1000)).toLocaleString()
-                tmp["ts"] = v.data.ts
-                tmp["site"] = v.data.site
-                tmp["price"] = v.data.price
-                tmp["ishandled"] = v.ishandled
+                tmp["height"] = v.height
+                tmp["prev_hash"] = v.prev_hash
+                tmp["data_hash"] = v.data_hash
+                tmp["_ts"] = (new Date(v.ts*1000)).toLocaleString()
+                tmp["ts"] = v.ts
+
+                _this.lines.block.push(tmp)
             });
   				}else{alert("Error!Code: "+status);}
   			});
@@ -87,6 +84,7 @@
   	computed: {
   	},
   	created(){
+  		this.getBlocks();
   		// this.getPort();
   		// this.checkStore();
   		// this.getPoolList();
