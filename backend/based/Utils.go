@@ -1,6 +1,10 @@
 package based
 
 import "strings"
+import (
+	"github.com/Doresimon/SM-Collection/SM3"
+	"strconv"
+)
 
 //need policy == hid* OR(cname* AND region1)
 func match(attr []string, policy string) bool{
@@ -25,4 +29,11 @@ func isexist(attr []string, a string) bool{
 		}
 	}
 	return false
+}
+
+func counthash(dataHash []byte,prevHash []byte,ts uint64,height int) []byte{
+	temp := dataHash
+	temp = append(temp, prevHash...)
+	temp = append(temp, []byte(strconv.Itoa(height))...)
+	return SM3.SM3_256(temp)
 }

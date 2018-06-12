@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func StartTimer() {
+func Consensus() {
 	for {
 		now := time.Now()
 		fmt.Println(now)
@@ -26,5 +26,6 @@ func timeToDo(ts uint64){
 	b.PrevHash = getBlockHash(nowheight)
 	b.Ts = ts
 	b.Height = nowheight+1
+	b.ThisHash = counthash(b.DataHash,b.PrevHash,b.Ts,b.Height)
 	putBlock(*b)
 }

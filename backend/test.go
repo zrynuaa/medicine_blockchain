@@ -6,6 +6,6 @@ import (
 )
 
 func main()  {
-	go based.StartTimer()
+	go based.Consensus()
 	server.Run()
 }
