@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 	//"fmt"
+	"github.com/Doresimon/SM-Collection/SM3"
 	"fmt"
 )
 var Sdb_Pre, _ = leveldb.OpenFile("./db/Prescription.db", nil)
@@ -577,16 +578,20 @@ func IsBuy(presciption_id string, site string, medicine_name string) bool {
 }
 
 //Block结构
-func PutBlock(a Block){
+func putBlock(a Block){
 	aserial := a.serialize()
 	err := Sdb_Block.Put([]byte(strconv.Itoa(a.Height)), aserial, nil)
 	if err != nil {
 		return
 	}
-	//fmt.Println("BlockInfo::")
-	//fmt.Println("  Height::", a.Height)
-	//fmt.Printf("  PrevHash::%x\n", a.PrevHash)
-	//fmt.Printf("  DataHash::%x\n", a.DataHash)
+	err = Sdb_Block.Put([]byte("last"), []byte(strconv.Itoa(a.Height)), nil)
+	if err != nil {
+		return
+	}
+	fmt.Println(a.Height)
+	fmt.Println(a.DataHash)
+	fmt.Println(a.PrevHash)
+	fmt.Println(a.Ts)
 }
 
 //获得block
@@ -594,6 +599,10 @@ func GetBlock() []*Block{
 	var result = []*Block{}
 	iter := Sdb_Block.NewIterator(nil, nil)
 	for iter.Next() {
+		if string(iter.Key()) == "last" {
+			continue
+		}
+
 		value := deserializeBlock(iter.Value())
 		result = append(result, value)
 	}
@@ -603,4 +612,78 @@ func GetBlock() []*Block{
 		return nil
 	}
 	return result
+}
+
+func getOneMinuteBeforeHash(ts uint64) []byte{
+	var result = []byte{}
+	iter := Sdb_Pre.NewIterator(nil, nil)
+	for iter.Next() {
+		value := deserializePrescription(iter.Value())
+		if ts - value.Ts >= 60 && ts - value.Ts < 120 {
+			result = append(result, iter.Value()...)
+		}
+	}
+	iter.Release()
+	err := iter.Error()
+	if err != nil {
+		return nil
+	}
+
+	iter = Sdb_TX.NewIterator(nil, nil)
+	for iter.Next() {
+		if string(iter.Key()) == "last" || len(iter.Key()) > 8 {
+			continue
+		}
+		value := deserializeTransaction(iter.Value())
+		if ts - value.Data.Ts >= 60 && ts - value.Data.Ts < 120 {
+			result = append(result, iter.Value()...)
+		}
+	}
+	iter.Release()
+	err = iter.Error()
+	if err != nil {
+		return nil
+	}
+
+	iter = Sdb_Buy.NewIterator(nil, nil)
+	for iter.Next() {
+		if string(iter.Key()) == "last" || len(iter.Key()) > 8 {
+			continue
+		}
+		value := deserializeBuy(iter.Value())
+		if ts - value.Data.Ts >= 60 && ts - value.Data.Ts < 120 {
+			result = append(result, iter.Value()...)
+		}
+	}
+	iter.Release()
+	err = iter.Error()
+	if err != nil {
+		return nil
+	}
+
+	return SM3.SM3_256(result)
+}
+
+func getBlockHash(height int) []byte{
+	if height == 0 {
+		return []byte("")
+	}
+	data, err := Sdb_Block.Get([]byte(strconv.Itoa(height)), nil)
+	if err != nil {
+		return nil
+	}
+
+	return SM3.SM3_256(data)
+}
+
+func getLastBlockHeight() int{
+	data, err := Sdb_Block.Get([]byte("last"), nil)
+	if err != nil {
+		return 0
+	}
+	height, err := strconv.Atoi(string(data))
+	if err != nil {
+		return 0
+	}
+	return height
 }
