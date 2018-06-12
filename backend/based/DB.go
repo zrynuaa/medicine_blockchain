@@ -13,7 +13,7 @@ var Sdb_Map, _ = leveldb.OpenFile("./db/Mapping.db", nil)
 var Sdb_TX, _ 	= leveldb.OpenFile("./db/Transaction.db", nil)
 var Sdb_Buy, _ 	= leveldb.OpenFile("./db/Buy.db", nil)
 var Sdb_Dose, _ 	= leveldb.OpenFile("./db/Dose.db", nil)
-var Sdb_Block, _ = leveldb.OpenFile("./db/Block.db", nil)
+var Sdb_Block, _ = leveldb.OpenFile("./db/BlockChain.db", nil)
 
 //存储处方，输入一个处方
 func PutPrescription(a Presciption) {
@@ -591,6 +591,7 @@ func putBlock(a Block){
 	fmt.Println(a.Height)
 	fmt.Println(a.DataHash)
 	fmt.Println(a.PrevHash)
+	fmt.Println(a.ThisHash)
 	fmt.Println(a.Ts)
 }
 
@@ -672,8 +673,8 @@ func getBlockHash(height int) []byte{
 	if err != nil {
 		return nil
 	}
-
-	return SM3.SM3_256(data)
+	block := deserializeBlock(data)
+	return counthash(block.DataHash, block.PrevHash, block.Ts, block.Height)
 }
 
 func getLastBlockHeight() int{

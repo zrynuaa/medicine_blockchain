@@ -65,6 +65,7 @@ type Block struct {
 	Height int `json:"height"`
 	DataHash []byte `json:"data_hash"`
 	Ts uint64 `json:"ts"`
+	ThisHash []byte `json:"this_hash"`
 }
 
 //存储的处方结构，data部分可能将来加密
