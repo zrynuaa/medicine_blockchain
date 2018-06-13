@@ -25,7 +25,7 @@
         <!-- <li><a href="#Transaction" data-toggle="tab" @click=""><h2>购物车</h2></a></li> -->
         <li><a href="#Buys" data-toggle="tab" @click=""><h2>购买历史</h2></a></li>
         <h1 class="pull-right">
-          <select v-model="username" @change="changeUser()" class="form-control">
+          <select v-model="username" @change="changeUser()" class="form-control" style="height: 80px; width: 200px;font-size:100%;">
             <option value="*">终端</option>
             <option value="patientid1">病人A</option>
             <option value="patientid2">病人B</option>
@@ -63,7 +63,7 @@
 
       <!-- modal -->
       <div class="modal fade" tabindex="-1" role="dialog" id="BUY_MODAL">
-        <div class="modal-dialog" role="document" style="width:66%;">
+        <div class="modal-dialog" role="document" style="width:88%;">
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -76,7 +76,7 @@
                       <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div>
                       <div slot="patient_id" slot-scope="props">{{patient[props.row.patient_id]}}</div>
                       <div slot="_ts" slot-scope="props"><span style="display:none;">{{props.row.ts}}</span>{{props.row._ts}}</div>
-                      <div slot="buy" slot-scope="props"><button class="btn btn-success btn-md btn-block" @click="buy(props.row, $event)" :disabled="props.row.ishandled>1">choooose this</button></div>
+                      <div slot="buy" slot-scope="props"><button class="btn btn-success btn-md btn-block" @click="buy(props.row, $event)" :disabled="props.row.ishandled>1">选择</button></div>
                   </v-client-table>
                 </div>
               </div>
@@ -138,6 +138,7 @@
       					medicine_price: "价格", //
       					doctor_id: "医生ID", //
       					detail: "详情", //
+      					buy: "购买", //
       				},
               orderBy: { ascending:false, column:"_ts", }
       			},
