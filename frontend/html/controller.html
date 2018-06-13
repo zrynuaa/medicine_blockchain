@@ -49,12 +49,14 @@
           <v-client-table :columns="columns.transaction" :data="lines.transaction" :options="options">
               <div slot="chemistry_name" slot-scope="props">{{chemistry[props.row.chemistry_name]}}</div>
               <div slot="patient_id" slot-scope="props">{{patient[props.row.patient_id]}}</div>
+              <div slot="_ts" slot-scope="props"><span style="display:none;">{{props.row.ts}}</span>{{props.row._ts}}</div>
           </v-client-table>
         </div>
         <div class="tab-pane fade margin-top-5" id="Buys">
           <v-client-table :columns="columns.buy" :data="lines.buy" :options="options">
               <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}}</div>
               <div slot="patient_id" slot-scope="props">{{patient[props.row.patient_id]}}</div>
+              <div slot="_ts" slot-scope="props"><span style="display:none;">{{props.row.ts}}</span>{{props.row._ts}}</div>
           </v-client-table>
         </div>
       </div>
@@ -73,6 +75,7 @@
                   <v-client-table :columns="columns.tx" :data="buy_modal.lines" :options="options">
                       <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div>
                       <div slot="patient_id" slot-scope="props">{{patient[props.row.patient_id]}}</div>
+                      <div slot="_ts" slot-scope="props"><span style="display:none;">{{props.row.ts}}</span>{{props.row._ts}}</div>
                       <div slot="buy" slot-scope="props"><button class="btn btn-success btn-md btn-block" @click="buy(props.row, $event)" :disabled="props.row.ishandled>1">choooose this</button></div>
                   </v-client-table>
                 </div>
@@ -94,7 +97,7 @@
   <!-- vue -->
   <script>
       // var ServerIP = window.location.host
-      var ServerIP = "192.168.1.147:"+window.location.port
+      var ServerIP = "192.168.43.115:"+window.location.port
       Vue.use(VueTables.ClientTable);
       var app = new Vue({
       	el: '#master-page',
@@ -113,11 +116,30 @@
               buy:["key", "patient_id",  "type",  "medicine_amount",  "medicine_name",  "medicine_price",  "presciption_id",  "site",  "_ts",],
             },
             options: {
-      				headings: {
-      					xxx: "xxx", //
-      				},
       				sortable: ["key", "isbuy",  "hospital_id",  "patient_id",  "policy",  "presciption_id",  "_ts",  "type",  "amount",  "chemistry_name",  "disease",  "doctor_id",],
-      				filterable: ["xxx"],
+              headings: {
+      					patient_id: "病人ID", //
+      					presciption_id: "处方ID", //
+      					medicine_name: "药名", //
+      					amount: "剂量", //
+      					policy: "属性策略", //
+      					_ts: "时间", //
+      					site: "药店地址", //
+      					price: "总价", //
+      					ishandled: "状态", //
+      					key: "#", //
+      					isbuy: "购买状态", //
+      					hospital_id: "医院ID", //
+      					presciption_id: "处方ID", //
+      					type: "类型", //
+      					chemistry_name: "化学品名", //
+      					disease: "诊断", //
+      					medicine_amount: "剂量", //
+      					medicine_price: "价格", //
+      					doctor_id: "医生ID", //
+      					detail: "详情", //
+      				},
+              orderBy: { ascending:false, column:"_ts", }
       			},
             lines:{
               prescription:[],

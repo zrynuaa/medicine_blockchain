@@ -50,40 +50,6 @@
         </div>
       </div>
 
-
-      <!-- modal -->
-      <div class="modal fade" tabindex="-1" role="dialog" id="Add_Drug_Modal">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title">Add Drug</h4>
-            </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-md-6 margin-top-5">
-                  <input typ="teext" class="form-control" v-model="new_drug.name" placeholder="drug name">
-                </div>
-                <div class="col-md-6 margin-top-5">
-                  <input type="number" class="form-control" v-model="new_drug.qty" placeholder="drug quantity">
-                </div>
-                <div class="col-md-6 margin-top-5">
-                  <input type="text" class="form-control" v-model="new_drug.remark" placeholder="remark">
-                </div>
-                <div class="col-md-6 margin-top-5">
-                  <input type="text" class="form-control" v-model="new_drug.usage" placeholder="drug usage">
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer margin-top-5">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" @click="" :disabled="new_drug.name==''||new_drug.qty<1">Finish</button>
-            </div>
-          </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-      </div><!-- /.modal -->
-    </div>
-
   </body>
 
   <!-- map for  chinese name -->
@@ -92,7 +58,7 @@
   <script>
 
   // var ServerIP = window.location.host
-  var ServerIP = "192.168.1.147:"+window.location.port
+  var ServerIP = "192.168.43.115:"+window.location.port
   Vue.use(VueTables.ClientTable);
   var app = new Vue({
   	el: '#master-page',
@@ -127,10 +93,18 @@
         },
         options: {
   				headings: {
-  					xxx: "xxx", //
+  					patient_id: "病人ID", //
+  					presciption_id: "处方ID", //
+  					medicine_name: "药名", //
+  					amount: "剂量", //
+  					_ts: "时间", //
+  					site: "药店地址", //
+  					price: "总价", //
+  					ishandled: "状态", //
   				},
-  				sortable: ["patient_id", "presciption_id", "medicine_name","amount","site","price","ishandled","ts",],
+  				sortable: ["patient_id", "presciption_id", "medicine_name","amount","site","price","ishandled","_ts",],
   				filterable: ["xxx"],
+          orderBy: { ascending:false, column:"_ts", }
   			},
         pool_list:[],
         drug_list:[],
@@ -252,21 +226,29 @@
       getPort: function(){
         if (location.port=="8881") { this.storeID = 1  }
         if (location.port=="8882") { this.storeID = 2  }
+        if (location.port=="8883") { this.storeID = 3  }
   		},
       checkStore: function(){
         if (this.storeID==1) {
           this.store = {
-            name: "吉星大药房",
+            name: "药店A - 吉星大药房",
             sid: "10086",
             type: 1,
             site: "邯郸路220号",
           }
-        }else{
+        }else if(this.storeID==2){
           this.store = {
-            name: "如意小药店",
+            name: "药店B - 如意小药店",
             sid: "10010",
             type: 1,
             site: "闵大荒",
+          }
+        }else{
+          this.store = {
+            name: "药店C - 亮亮连锁药店",
+            sid: "66666",
+            type: 1,
+            site: "杨浦区",
           }
         }
   		},

@@ -22,12 +22,12 @@
 
       <!-- main view -->
       <div class="row text-center">
-        <h1>Publish A Prescription</h1>
+        <h1>医院节点 - 发布处方</h1>
       </div>
       <div class="row margin-top-5 padding-side-100">
         <div class="col-md-12 well">
           <div class="col-xs-6">
-            <span>hospital:: </span>
+            <span>hospital - 医院节点ID:: </span>
           </div>
           <div class="col-xs-6">
             <span><input type="text" class="form-control" v-model="new_data.hospital" placeholder="hid1,hid2...10:: 0x00......" :disabled="true"></input></span>
@@ -35,7 +35,7 @@
         </div>
         <div class="col-md-12 well">
           <div class="col-xs-6">
-            <span>patient:: </span>
+            <span>patient - 病人ID:: </span>
           </div>
           <div class="col-xs-6">
             <span><input type="text" class="form-control" v-model="new_data.patient" placeholder="pid:: 0x01......"></input></span>
@@ -43,7 +43,7 @@
         </div>
         <div class="col-md-12 well">
           <div class="col-xs-6">
-            <span>doctor:: </span>
+            <span>doctor - 医生ID:: </span>
           </div>
           <div class="col-xs-6">
             <span><input type="text" class="form-control" v-model="new_data.doctor" placeholder="did:: 0x02......"></input></span>
@@ -51,7 +51,7 @@
         </div>
         <div class="col-md-12 well">
           <div class="col-xs-6">
-            <span>diagnose:: </span>
+            <span>diagnose - 诊断:: </span>
           </div>
           <div class="col-xs-6">
             <span><input type="text" class="form-control" v-model="new_data.diagnose" placeholder="freetext"></input></span>
@@ -75,7 +75,7 @@
         </div> -->
         <div class="col-md-12 well">
           <div class="col-xs-6">
-            <span>prescription content:: </span>
+            <span>prescription content - 处方内容:: </span>
           </div>
           <div class="col-xs-6">
             <span><button class="btn btn-sm btn-success btn-block" @click="addDrug('call')"><span class="glyphicon glyphicon-plus"></span></button></span>
@@ -98,7 +98,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title">Add Drug</h4>
+              <h4 class="modal-title">Add Drug - 添加药品</h4>
             </div>
             <div class="modal-body">
               <div class="row">
@@ -136,7 +136,7 @@
   <!-- vue -->
   <script>
   // var ServerIP = window.location.host
-  var ServerIP = "192.168.1.147:"+window.location.port
+  var ServerIP = "192.168.43.115:"+window.location.port
 
   Vue.use(VueTables.ClientTable);
   var app = new Vue({

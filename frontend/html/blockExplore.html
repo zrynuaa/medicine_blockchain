@@ -37,7 +37,7 @@
   <!-- vue -->
   <script>
   // var ServerIP = window.location.host
-  var ServerIP = "192.168.1.147:"+window.location.port
+  var ServerIP = "192.168.43.115:"+window.location.port
   Vue.use(VueTables.ClientTable);
   var app = new Vue({
   	el: '#master-page',
@@ -52,9 +52,14 @@
         options: {
   				headings: {
   					height: "区块高度", //
+  					prev_hash: "父区块哈希", //
+  					this_hash: "自哈希", //
+  					data_hash: "数据哈希", //
+  					ts: "时间戳", //
+  					_ts: "时间", //
   				},
   				sortable: ["height", "prev_hash", "this_hash", "data_hash","ts","_ts",],
-  				filterable: ["xxx"],
+          orderBy: { ascending:false, column:"height", }
   			},
   		}
   	},
