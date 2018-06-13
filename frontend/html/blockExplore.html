@@ -19,6 +19,11 @@
   <body>
     <div class="container-fluid" id="master-page">
         <div class="row">
+          <div class="col-xs-12 text-center">
+            <h1>Block Info</h1>
+          </div>
+        </div>
+        <div class="row">
           <div class=" col-xs-12">
             <v-client-table :columns="columns.block" :data="lines.block" :options="options">
                 <!-- <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div> -->
@@ -32,7 +37,7 @@
   <!-- vue -->
   <script>
   // var ServerIP = window.location.host
-  var ServerIP = "192.168.1.138:"+window.location.port
+  var ServerIP = "192.168.1.147:"+window.location.port
   Vue.use(VueTables.ClientTable);
   var app = new Vue({
   	el: '#master-page',
@@ -60,6 +65,7 @@
 
   			$.post("http://"+ ServerIP + "/getblockchain",{},function(data,status){
   				if (status=="success") {
+            console.log(data);
             var objs = eval(data)
             console.log(objs);
             if (objs==null) {return}
