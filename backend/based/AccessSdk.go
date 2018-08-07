@@ -68,7 +68,7 @@ func putInfo(what string, id string, value string) (string, error){
 
 //对应cc中的getids
 func getIds(what,id string) (string, error){
-	payload, err := fSetup.Query([]string{"invoke", "query", what, id})
+	payload, err := fSetup.Query([]string{"invoke", "getids", what, id})
 	if err != nil {
 		return "", fmt.Errorf("query getids error!:%v", err)
 	}
@@ -77,7 +77,7 @@ func getIds(what,id string) (string, error){
 
 //对应cc中的getpres
 func getPres(what,id string) (string, error){
-	payload, err := fSetup.Query([]string{"invoke", "query", what, id})
+	payload, err := fSetup.Query([]string{"invoke", "getpres", what, id})
 	if err != nil {
 		return "", fmt.Errorf("query getpres error!:%v", err)
 	}
