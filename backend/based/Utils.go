@@ -4,6 +4,7 @@ import "strings"
 import (
 	"github.com/Doresimon/SM-Collection/SM3"
 	"strconv"
+	"bytes"
 )
 
 //need policy == hid* OR(cname* AND region1)
@@ -37,3 +38,13 @@ func counthash(dataHash []byte,prevHash []byte,ts uint64,height int) []byte{
 	temp = append(temp, []byte(strconv.Itoa(height))...)
 	return SM3.SM3_256(temp)
 }
+
+func splitBytesbyn(a []byte) [][]byte{
+	return bytes.SplitN(a, []byte("\n"), -1)
+}
+
+func splitStringbyn(a string) []string {
+	return strings.SplitN(a, "\n", -1)
+}
+
+
