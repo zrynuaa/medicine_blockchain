@@ -83,7 +83,11 @@ func (t *System)GetIDs(stub shim.ChaincodeStubInterface, args []string) peer.Res
 	var rs []byte
 	for _,v := range preIDlist{
 		rs = append(rs, []byte(v)...)
+<<<<<<< HEAD
 		rs = append(rs, []byte("\n\n")...)
+=======
+		rs = append(rs, []byte("\n")...)
+>>>>>>> 70548c832c2172f265427450196071c5e8316444
 	}
 
 	return shim.Success(rs)
@@ -106,7 +110,11 @@ func (t *System)Getpres(stub shim.ChaincodeStubInterface, args []string) peer.Re
 	var rs []byte
 	for _,v := range prelist{
 		rs = append(rs, []byte(v)...)
+<<<<<<< HEAD
 		rs = append(rs, []byte("\n\n")...)
+=======
+		rs = append(rs, []byte("\n")...)
+>>>>>>> 70548c832c2172f265427450196071c5e8316444
 	}
 
 	return shim.Success(rs)
