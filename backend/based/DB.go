@@ -17,16 +17,6 @@ var Sdb_Block, _ = leveldb.OpenFile("./db/BlockChain.db", nil)
 
 //存储处方，输入一个处方
 func PutPrescription(a Presciption) {
-	// db, err := leveldb.OpenFile("./db/Prescription.db", nil)
-	// defer db.Close()
-	// if err != nil {
-	// 	return
-	// }
-	// db2, err := leveldb.OpenFile("./db/Mapping.db", nil)
-	// defer Sdb_Map.Close()
-	// if err != nil {
-	// 	return
-	// }
 
 	aserial := a.serialize()
 	err := Sdb_Pre.Put([]byte(a.Presciption_id), aserial, nil)
@@ -235,12 +225,6 @@ func PutDose(a Dose) {
 
 //药店判断自己是否已经发布tran
 func IsPostdata(presciption_id string, site string, medicine_name string) bool {
-	//db, err := leveldb.OpenFile("./db/Transaction.db", nil)
-	//defer db.Close()
-	//if err != nil {
-	//	return false
-	//}
-
 	iter := Sdb_TX.NewIterator(nil, nil)
 	for iter.Next() {
 		if string(iter.Key())=="last" || len(iter.Key()) > 8 {

@@ -43,6 +43,7 @@ type Presciption struct {
 
 type Transaction struct {
 	Type int `json:"type"`
+	Transaction_id string `json:"transaction_id"`
 	Patient_id string `json:"patient_id"`
 	Data *Data_tran `json:"data"`
 }
@@ -56,6 +57,7 @@ type Dose struct {
 
 type Buy struct {
 	Type int `json:"type"`
+	Buy_id string `json:"buy_id"`
 	Data *Data_buy `json:"data"`
 	Patient_id string `json:"patient_id"`
 }
