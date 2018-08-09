@@ -58,8 +58,8 @@ func AddDoses()  {
 
 	var dose []based.Dose
 	dose = append(dose, d1, d2, d3, d4, d5, d6,d7,d8,d9,d10,d11,d12)
-	for _,v := range dose {
-		based.PutDose(v)
+	for k,v := range dose {
+		based.PutIntoDb("4", string(k), v.Serialize())
 	}
 }
 
@@ -114,9 +114,7 @@ func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 
 //药店获取能解密的处方信息,处理成药品信息
 func StoregetMInfo(store Drugstore) []Transaction {
-
-	attrs := store.Attrs
-	pres := based.GetPrescriptionByattr(attrs)//获取药店能够解密的所有的处方信息
+	pres,_ := based.GetPreFromDbByFilter(nil)//获取药店能够解密的所有的处方信息
 
 	num := len(pres)
 	var trans []Transaction
@@ -125,6 +123,7 @@ func StoregetMInfo(store Drugstore) []Transaction {
 		var tran Transaction
 		tran.Patient_id = pres[i].Patient_id
 
+		//todo 怎么存储本地的全局信息
 		mname := GetMedicineName(store, pres[i].Data.Chemistry_name)	//获取药品名称
 
 		for _,name := range mname {
@@ -134,7 +133,7 @@ func StoregetMInfo(store Drugstore) []Transaction {
 			tran.Data.Site = store.Location
 
 			tran.Data.Medicine_name = name
-			amount, totalprice := based.GetDosedata(name, pres[i].Data.Chemistry_name, pres[i].Data.Amount)
+			amount, totalprice,_ := based.GetDoseFromDb(name, pres[i].Data.Chemistry_name, pres[i].Data.Amount)
 			tran.Data.Amount = amount
 			tran.Data.Price = totalprice
 
@@ -167,36 +166,36 @@ func StoresendTransaction(tran Transaction)  {
 	ttot.Patient_id = tran.Patient_id
 	ttot.Data = tran.Data
 
-	based.PutTransaction(ttot)
+	//based.PutTransaction(ttot)
 }
 
 //获取链上数据
-func GetreadyInfo(mark, username string) ([]Presciption, []Transaction) {
-	if mark == "Prescription"{
-		var pres []Presciption
-		for _,v := range based.GetPrescriptionByid(username){
-			pre := new(Presciption)
-			pre.Data = v
-			if based.IsBuy(v.Presciption_id,"*","*"){
-				pre.Isbuy = 1
-			}
-			pres = append(pres, *pre)
-		}
-		return pres,nil
-	}else {
-		var trans []Transaction
-		for _,v := range based.GetTransactionByid(username){
-			tran := new(Transaction)
-			tran.Data = v.Data
-			tran.Patient_id = v.Patient_id
-			if based.IsBuy(v.Data.Presciption_id,"*","*"){
-				tran.Ishandled = 2
-			}
-			trans = append(trans, *tran)
-		}
-		return nil,trans
-	}
-}
+//func GetreadyInfo(mark, username string) ([]Presciption, []Transaction) {
+//	if mark == "Prescription"{
+//		var pres []Presciption
+//		for _,v := range based.GetPrescriptionByid(username){
+//			pre := new(Presciption)
+//			pre.Data = v
+//			if based.IsBuy(v.Presciption_id,"*","*"){
+//				pre.Isbuy = 1
+//			}
+//			pres = append(pres, *pre)
+//		}
+//		return pres,nil
+//	}else {
+//		var trans []Transaction
+//		for _,v := range based.GetTransactionByid(username){
+//			tran := new(Transaction)
+//			tran.Data = v.Data
+//			tran.Patient_id = v.Patient_id
+//			if based.IsBuy(v.Data.Presciption_id,"*","*"){
+//				tran.Ishandled = 2
+//			}
+//			trans = append(trans, *tran)
+//		}
+//		return nil,trans
+//	}
+//}
 //用户通过监管节点买药,发布买药信息
 func BuyMedicine(tran based.Transaction)  {
 	var buy based.Buy
@@ -207,7 +206,7 @@ func BuyMedicine(tran based.Transaction)  {
 
 	buy.Data = &based.Data_buy{Presciption_id:data.Presciption_id, Medicine_name:data.Medicine_name, Medicine_amount:data.Amount, Medicine_price:data.Price,Site:data.Site}
 	buy.Data.Ts = uint64(time.Now().Unix())
-	based.PutBuy(buy)
+	//based.PutBuy(buy)
 }
 
 func AddHandletoServer(server *http.ServeMux, filename string)  {

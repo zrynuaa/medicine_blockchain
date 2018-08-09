@@ -234,7 +234,7 @@ func deserializeTransaction(d []byte) *Transaction {
 	return dp
 }
 
-func (b *Dose)serialize() []byte {
+func (b *Dose)Serialize() []byte {
 	var result bytes.Buffer
 
 	encoder := gob.NewEncoder(&result)

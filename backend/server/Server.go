@@ -28,21 +28,21 @@ func HospitalSendPrescription(w http.ResponseWriter, r *http.Request)  {
 func Store1getMInfo(w http.ResponseWriter, r *http.Request)  {
 	setAccess(w)
 	var trans []Transaction
-	trans = StoregetMInfo(drugstore1)
+	//trans = StoregetMInfo(drugstore1)
 	json.NewEncoder(w).Encode(trans)
 }
 
 func Store2getMInfo(w http.ResponseWriter, r *http.Request)  {
 	setAccess(w)
 	var trans []Transaction
-	trans = StoregetMInfo(drugstore2)
+	//trans = StoregetMInfo(drugstore2)
 	json.NewEncoder(w).Encode(trans)
 }
 
 func Store3getMInfo(w http.ResponseWriter, r *http.Request)  {
 w.Header().Set("Access-Control-Allow-Origin", "*")
 	var trans []Transaction
-	trans = StoregetMInfo(drugstore3)
+	//trans = StoregetMInfo(drugstore3)
 	json.NewEncoder(w).Encode(trans)
 }
 
@@ -57,20 +57,20 @@ func Sethandle(w http.ResponseWriter, r *http.Request)  {
 
 func GetPrescriptions(w http.ResponseWriter, r *http.Request)  {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	pres,_ := GetreadyInfo("Prescription", r.FormValue("username"))
-	json.NewEncoder(w).Encode(pres)
+	//pres,_ := GetreadyInfo("Prescription", r.FormValue("username"))
+	//json.NewEncoder(w).Encode(pres)
 }
 
 func GetTransactions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	// trans,_ := GetreadyInfo("Transaction", r.FormValue("username"))
-	_,trans := GetreadyInfo("Transaction", r.FormValue("username"))
-	json.NewEncoder(w).Encode(trans)
+	//_,trans := GetreadyInfo("Transaction", r.FormValue("username"))
+	//json.NewEncoder(w).Encode(trans)
 }
 
 func GetBuys(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	json.NewEncoder(w).Encode(based.GetBuyByid(r.FormValue("username")))
+	//json.NewEncoder(w).Encode(based.GetBuyByid(r.FormValue("username")))
 }
 
 func UserbuyMedicine(w http.ResponseWriter, r *http.Request) {
@@ -85,13 +85,13 @@ func UserbuyMedicine(w http.ResponseWriter, r *http.Request) {
 
 func GetBlockchain(w http.ResponseWriter, r *http.Request)  {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	json.NewEncoder(w).Encode(based.GetBlock())
+	//json.NewEncoder(w).Encode(based.GetBlock())
 }
 
 func Run()  {
-	if amount,_ := based.GetDosedata("mid1", "cid1", 1); amount == 0 {
-		AddDoses() //初始化化学名与药品对应关系以及药品价格
-	}
+	//if amount,_ := based.GetDosedata("mid1", "cid1", 1); amount == 0 {
+	//	AddDoses() //初始化化学名与药品对应关系以及药品价格
+	//}
 
 	finish := make(chan bool)
 
@@ -107,13 +107,13 @@ func Run()  {
 
 	server8882 := http.NewServeMux()
 	AddHandletoServer(server8882, "store.html")
-	drugstore2 = SetStore2Attrs()
+	//drugstore2 = SetStore2Attrs()
 	server8882.HandleFunc("/getprelist8882", Store2getMInfo)
 	server8882.HandleFunc("/sethandle8882", Sethandle)
 
 	server8883 := http.NewServeMux()
 	AddHandletoServer(server8883, "store.html")
-	drugstore3 = SetStore3Attrs()
+	//drugstore3 = SetStore3Attrs()
 	server8883.HandleFunc("/getprelist8883", Store3getMInfo)
 	server8883.HandleFunc("/sethandle8883", Sethandle)
 
