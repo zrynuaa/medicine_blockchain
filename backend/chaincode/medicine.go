@@ -51,13 +51,16 @@ func (t *System)Putinfo(stub shim.ChaincodeStubInterface, args []string) peer.Re
 		return shim.Error("The number of arguments is insufficient.")
 	}
 
-	if args[1] == "0" {
+	if args[1] == "0" && isNotExist(t.prescriptionID, args[2]){
 		t.prescriptionID = append(t.prescriptionID, args[2])
-	} else if args[1] == "1" {
+	} else if args[1] == "1" && isNotExist(t.medicineID, args[2]){
 		t.medicineID = append(t.medicineID, args[2])
-	} else if args[1] == "2"{
+	} else if args[1] == "2" && isNotExist(t.buyID, args[2]){
 		t.buyID = append(t.buyID, args[2])
+	} else {
+		return shim.Error("id already exists!")
 	}
+
 
 	// t.prescriptionID = append(t.prescriptionID, args[0])
 	err := stub.PutState(args[2], []byte(args[3]))
@@ -83,11 +86,7 @@ func (t *System)GetIDs(stub shim.ChaincodeStubInterface, args []string) peer.Res
 	var rs []byte
 	for _,v := range preIDlist{
 		rs = append(rs, []byte(v)...)
-<<<<<<< HEAD
 		rs = append(rs, []byte("\n\n")...)
-=======
-		rs = append(rs, []byte("\n")...)
->>>>>>> 70548c832c2172f265427450196071c5e8316444
 	}
 
 	return shim.Success(rs)
@@ -110,11 +109,7 @@ func (t *System)Getpres(stub shim.ChaincodeStubInterface, args []string) peer.Re
 	var rs []byte
 	for _,v := range prelist{
 		rs = append(rs, []byte(v)...)
-<<<<<<< HEAD
 		rs = append(rs, []byte("\n\n")...)
-=======
-		rs = append(rs, []byte("\n")...)
->>>>>>> 70548c832c2172f265427450196071c5e8316444
 	}
 
 	return shim.Success(rs)
@@ -150,6 +145,15 @@ func (t *System)getids(args []string) ([]string, error) {
 	preIDlist = list[po+1:]
 
 	return preIDlist, nil
+}
+
+func isNotExist(a []string, b string) bool {
+	for _,j := range a{
+		if j == b {
+			return false
+		}
+	}
+	return true
 }
 
 func main() {
