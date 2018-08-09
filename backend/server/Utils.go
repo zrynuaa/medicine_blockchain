@@ -138,17 +138,19 @@ func StoregetMInfo(store Drugstore) []Transaction {
 			tran.Data.Price = totalprice
 
 			//药方已处理时,该药品信息不能操作.药方未处理时,查看链上是否存在该药品信息,若存在则不能操作
-			if based.IsBuy(pres[i].Presciption_id, "*", "*") {
-				if based.IsBuy(tran.Data.Presciption_id,store.Location,name) {
+			if IsBuy(pres[i].Presciption_id, "", "") {
+				//处方已经被处理
+				if IsBuy(tran.Data.Presciption_id,store.Location,name) {
 					tran.Ishandled = 3		//该药品是该药店卖的
 				}else {
-					tran.Ishandled = 2
+					tran.Ishandled = 2		//别的药店卖出去的
 				}
 			}else {
-				if based.IsPostdata(tran.Data.Presciption_id, store.Location, name) {
-					tran.Ishandled = 1
+				//处方未被处理
+				if IsPostdata(tran.Data.Presciption_id, store.Location, name) {
+					tran.Ishandled = 1		//处方还没结束，但是已经接单
 				}else {
-					tran.Ishandled = 0
+					tran.Ishandled = 0		//还没有接单
 				}
 			}
 
@@ -165,8 +167,17 @@ func StoresendTransaction(tran Transaction)  {
 	ttot.Type = 1
 	ttot.Patient_id = tran.Patient_id
 	ttot.Data = tran.Data
+	ttot.Ts = uint64(time.Now().Unix())
 
-	//based.PutTransaction(ttot)
+	buf,_ := json.Marshal(ttot)
+	digest := SM3.SM3_256(buf)
+	tranid := fmt.Sprintf("%x", digest)
+	ttot.Transaction_id = tranid
+
+	//todo policy
+	tranencdata := bswabe.SerializeBswabeCphKey(bswabe.CP_Enc(pub, string(ttot.Serialize()),""))
+
+	based.PutIntoDb("1",ttot.Transaction_id,tranencdata)
 }
 
 //获取链上数据
@@ -226,4 +237,35 @@ func GetMedicineName(store Drugstore, cname string) []string {
 		}
 	}
 	return nil
+}
+
+//判断处方是否已经被处理，已处理返回true，否则返回false
+func IsBuy(Presciption_id, Location, name string) bool {
+	fil := make(map[string]string)
+	fil["preid"] = Presciption_id
+	if Location != "" {
+		fil["site"] = Location
+	}
+	if name != "" {
+		fil["medicine"] = name
+	}
+
+	trans, _ := based.GetPreFromDbByFilter(fil)
+	if trans != nil {
+		return true
+	}
+	return false
+}
+
+//判断处方是否已接单，接单返回true，否则返回false
+func IsPostdata(Presciption_id, Location, name string) bool {
+	fil := make(map[string]string)
+	fil["preid"] = Presciption_id
+	fil["site"] = Location
+	fil["medicine"] = name
+	trans, _ := based.GetTraFromDbByFilter(fil)
+	if trans != nil {
+		return true
+	}
+	return false
 }

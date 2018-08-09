@@ -2,6 +2,8 @@ package server
 
 import (
 	"testing"
+	"github.com/zrynuaa/medicine_blockchain/backend/based"
+	"fmt"
 )
 
 func TestPrescriptiontoTransaction(t *testing.T) {
@@ -24,6 +26,12 @@ func TestPrescriptiontoTransaction(t *testing.T) {
 	}
 
 	PrescriptiontoTransaction(hp) //将处方信息存到链上
+
+	//based.QuickAccess()
+	all,_ := based.GetPreFromDbByFilter(nil)
+	for _,v := range all{
+		fmt.Println(v)
+	}
 }
 
 func TestGetBuys(t *testing.T) {
