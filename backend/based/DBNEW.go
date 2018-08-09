@@ -28,10 +28,10 @@ func GetFromDbById(types string, id string) ([]byte, error){
 }
 
 //从db中获取pre信息，filter为map，示例见test，下同
-func GetPreFromDbByFilter(fil map[string]string, types string) ([]*Presciption, error){
+func GetPreFromDbByFilter(fil map[string]string) ([]*Presciption, error){
 	var result []*Presciption
 	var flag bool
-	all, err := getAllFromDb(types)
+	all, err := getAllFromDb("prescription")
 	if err != nil {
 		return nil, fmt.Errorf("getPreFromDbByFilter error! %s", err)
 	}
@@ -55,10 +55,10 @@ func GetPreFromDbByFilter(fil map[string]string, types string) ([]*Presciption, 
 	return result, nil
 }
 
-func GetTraFromDbByFilter(fil map[string]string, types string) ([]*Transaction, error){
+func GetTraFromDbByFilter(fil map[string]string) ([]*Transaction, error){
 	var result []*Transaction
 	var flag bool
-	all, err := getAllFromDb(types)
+	all, err := getAllFromDb("transaction")
 	if err != nil {
 		return nil, fmt.Errorf("getTraFromDbByFilter error! %s", err)
 	}
@@ -83,10 +83,10 @@ func GetTraFromDbByFilter(fil map[string]string, types string) ([]*Transaction, 
 	return result, nil
 }
 
-func GetBuyFromDbByFilter(fil map[string]string, types string) ([]*Buy, error){
+func GetBuyFromDbByFilter(fil map[string]string) ([]*Buy, error){
 	var result []*Buy
 	var flag bool
-	all, err := getAllFromDb(types)
+	all, err := getAllFromDb("buy")
 	if err != nil {
 		return nil, fmt.Errorf("getBuyFromDbByFilter error! %s", err)
 	}
@@ -109,6 +109,30 @@ func GetBuyFromDbByFilter(fil map[string]string, types string) ([]*Buy, error){
 		}
 	}
 	return result, nil
+}
+
+//获取剂量信息
+func GetDoseFromDb(medicine_name string, chemistry_name string, chemistry_amount int) (int,float32,error) {
+	//一个剂量化学名对应的药品剂量
+	var mamount int = 0
+	//一剂量药品单价
+	var mprice float32 = 0.0
+
+	all, err := getAllFromDb("dose")
+	if err != nil {
+		return 0, 0.0, fmt.Errorf("getDoseFromDbByFilter error! %s", err)
+	}
+
+	for _, one := range all {
+		value := deserializeDose(one)
+		if value.Chemistry_name == chemistry_name && value.Medicine_name == medicine_name {
+			mamount = value.Medicine_amount
+			mprice = value.Medicine_price
+			break
+		}
+	}
+
+	return chemistry_amount * mamount, float32(chemistry_amount) * float32(mamount) * mprice, nil
 }
 
 func getAllFromDb(types string) ([][]byte, error) {
@@ -136,12 +160,12 @@ func commandToBytes(command string) []byte {
 }
 
 //将解密后的信息存到db中，应在abe解密之后调用，types为presciption、transaction、buy等
-func putIntoDb(types string, id string, value []byte) error{
+func PutIntoDb(types string, id string, value []byte) error{
 	var key []byte
 	key = append(commandToBytes(types), []byte(id)...)
 	err := Db.Put(key, value, nil)
 	if err != nil {
-		return fmt.Errorf("putIntoDb error!%s", err)
+		return fmt.Errorf("PutIntoDb error!%s", err)
 	}
 	return nil
 }

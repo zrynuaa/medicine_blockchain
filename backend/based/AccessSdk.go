@@ -135,7 +135,7 @@ func synchronize(what int) error {
 	types := whatmap[what]
 	//update db
 	for i, j := range tempids {
-		err := putIntoDb(types, j, []byte(temppres[i]))
+		err := PutIntoDb(types, j, []byte(temppres[i]))
 		if err != nil {
 			return fmt.Errorf("syschronizeLastId error:%s", err)
 		}
