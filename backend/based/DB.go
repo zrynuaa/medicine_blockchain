@@ -185,12 +185,6 @@ func PutBuy(a Buy) {
 
 //存储剂量信息
 func PutDose(a Dose) {
-	//db, err := leveldb.OpenFile("./db/Dose.db", nil)
-	//defer db.Close()
-	//if err != nil {
-	//	return
-	//}
-
 	aserial := a.serialize()
 	last, err := Sdb_Dose.Get([]byte("last"), nil)
 	if err != nil {

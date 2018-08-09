@@ -39,11 +39,13 @@ func GetPreFromDbByFilter(fil map[string]string, types string) ([]*Presciption, 
 	for _, one := range all {
 		temp := deserializePrescription(one)
 		flag = true
-		for k,v := range fil {
-			if (k == "patid" && v == temp.Patient_id) || (k == "hosid" && v == temp.Hospital_id){
-				continue
+		if fil != nil {
+			for k, v := range fil {
+				if (k == "patid" && v == temp.Patient_id) || (k == "hosid" && v == temp.Hospital_id) {
+					continue
+				}
+				flag = false
 			}
-			flag = false
 		}
 
 		if flag {
@@ -64,12 +66,14 @@ func GetTraFromDbByFilter(fil map[string]string, types string) ([]*Transaction, 
 	for _, one := range all {
 		temp := deserializeTransaction(one)
 		flag = true
-		for k,v := range fil {
-			if (k == "preid" && v == temp.Data.Presciption_id) ||
-				(k == "site" && v == temp.Data.Site)|| (k == "medicine" && v == temp.Data.Medicine_name){
-				continue
+		if fil != nil {
+			for k, v := range fil {
+				if (k == "preid" && v == temp.Data.Presciption_id) ||
+					(k == "site" && v == temp.Data.Site) || (k == "medicine" && v == temp.Data.Medicine_name) {
+					continue
+				}
+				flag = false
 			}
-			flag = false
 		}
 
 		if flag {
@@ -90,12 +94,14 @@ func GetBuyFromDbByFilter(fil map[string]string, types string) ([]*Buy, error){
 	for _, one := range all {
 		temp := deserializeBuy(one)
 		flag = true
-		for k,v := range fil {
-			if (k == "preid" && v == temp.Data.Presciption_id) || (k == "patid" && v == temp.Patient_id) ||
-				(k == "site" && v == temp.Data.Site)|| (k == "medicine" && v == temp.Data.Medicine_name){
-				continue
+		if fil != nil {
+			for k, v := range fil {
+				if (k == "preid" && v == temp.Data.Presciption_id) || (k == "patid" && v == temp.Patient_id) ||
+					(k == "site" && v == temp.Data.Site) || (k == "medicine" && v == temp.Data.Medicine_name) {
+					continue
+				}
+				flag = false
 			}
-			flag = false
 		}
 
 		if flag {
