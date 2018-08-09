@@ -3,7 +3,6 @@ package server
 import (
 	"github.com/zrynuaa/medicine_blockchain/backend/based"
 	"encoding/json"
-	//"crypto/md5"
 	"fmt"
 	"time"
 	"net/http"
@@ -11,7 +10,36 @@ import (
 	"strconv"
 	"strings"
 	"github.com/Doresimon/SM-Collection/SM3"
+	"github.com/zrynuaa/cpabe06_client/bswabe"
+	"net/rpc"
+	"log"
 )
+
+var pub *bswabe.BswabePub
+var prv *bswabe.BswabePrv
+var attrs = "cid1 cid2 cid3 cid4 cid5 cid6 cid7 cid8 cid9 cid10 rid1" //节点属性
+
+//获取ABE服务器上的主公钥 √√√
+func GetABEPub() {
+	client, err := rpc.DialHTTP("tcp", "10.141.211.220:1234")
+	if err != nil {
+		log.Fatal("dialing:", err)
+	}
+
+	// Synchronous call同步方式调用
+	var reply []byte
+	err = client.Call("CPABE.Getpub", "", &reply)
+	if err != nil {
+		log.Fatal(" error:", err)
+	}
+	pub = bswabe.UnSerializeBswabePub(reply)//获取PublicKey
+
+	err = client.Call("CPABE.Getsk", attrs, &reply)
+	if err != nil {
+		log.Fatal("arith error:", err)
+	}
+	prv = bswabe.UnSerializeBswabePrv(pub, reply) //获取服务端返回的解密私钥
+}
 
 func AddDoses()  {
 	//设置化学名与药品对应关系
@@ -35,10 +63,11 @@ func AddDoses()  {
 	}
 }
 
-//医院发布处方信息
+//医院发布处方信息 √√√
 func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 
-	prePolicy := "hid1 OR (cid AND rid1)"
+	//prePolicy := "hid1 OR (cid AND rid1)"
+	prePolicy := "cid rid1 2of2 hid1 1of2"
 
 	var ptot based.Presciption
 	ptot.Type = 0
@@ -53,28 +82,32 @@ func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 
 	//生成处方ID
 	buf,_ := json.Marshal(ptot)
-	//digest := md5.Sum(buf)
 	digest := SM3.SM3_256(buf)
 	easypreid := fmt.Sprintf("%x", digest)
 
 	for i:=0; i<num ;i++{
 		ptot.Data.Chemistry_name = pre.Chemistrys[i].Chemistry_name
 		ptot.Data.Amount = pre.Chemistrys[i].Amount
-		//policy := pre.Policy
-		//fmt.Println(pre.Policy)
+
+		//为每个化学名生成不同的policy用于ABE加解密
 		policy := strings.Replace(prePolicy,"cid",pre.Chemistrys[i].Chemistry_name, -1)
-		//policy = strings.Replace(policy,"rid","rid", -1)
 		ptot.Policy = policy
-		//fmt.Println(policy)
+		fmt.Println(ptot.Policy)
 
 		if i>0{
 			easypreid = easypreid[:len(easypreid)-2]
 		}
 		easypreid += "_" + strconv.Itoa(i+1)
 		ptot.Presciption_id = easypreid
+		fmt.Println(ptot.Presciption_id)
 
-		
-		based.PutPrescription(ptot)//处方上链
+		//加密后存储到链上
+		preencdata := bswabe.SerializeBswabeCphKey(bswabe.CP_Enc(pub, string(ptot.Serialize()),ptot.Policy))
+		_, err := based.PutIntoFabric("0", ptot.Presciption_id, preencdata)
+		if err != nil {
+			fmt.Println(err)
+			return false
+		}
 	}
 	return true
 }

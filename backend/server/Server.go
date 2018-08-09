@@ -11,12 +11,14 @@ var drugstore1 Drugstore
 var drugstore2 Drugstore
 var drugstore3 Drugstore
 
+func setAccess(w http.ResponseWriter)  {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+}
 
 func HospitalSendPrescription(w http.ResponseWriter, r *http.Request)  {
-w.Header().Set("Access-Control-Allow-Origin", "*")
+	setAccess(w)
 	var pre HospitalPrescription
 	json.NewDecoder(r.Body).Decode(&pre)
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	if PrescriptiontoTransaction(pre){		//将处方信息分解成只含一个化学名的交易信息
 		fmt.Fprint(w,http.StatusOK)
@@ -24,14 +26,14 @@ w.Header().Set("Access-Control-Allow-Origin", "*")
 }
 
 func Store1getMInfo(w http.ResponseWriter, r *http.Request)  {
-w.Header().Set("Access-Control-Allow-Origin", "*")
+	setAccess(w)
 	var trans []Transaction
 	trans = StoregetMInfo(drugstore1)
 	json.NewEncoder(w).Encode(trans)
 }
 
 func Store2getMInfo(w http.ResponseWriter, r *http.Request)  {
-w.Header().Set("Access-Control-Allow-Origin", "*")
+	setAccess(w)
 	var trans []Transaction
 	trans = StoregetMInfo(drugstore2)
 	json.NewEncoder(w).Encode(trans)
@@ -54,13 +56,13 @@ func Sethandle(w http.ResponseWriter, r *http.Request)  {
 }
 
 func GetPrescriptions(w http.ResponseWriter, r *http.Request)  {
-w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	pres,_ := GetreadyInfo("Prescription", r.FormValue("username"))
 	json.NewEncoder(w).Encode(pres)
 }
 
 func GetTransactions(w http.ResponseWriter, r *http.Request) {
-w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	// trans,_ := GetreadyInfo("Transaction", r.FormValue("username"))
 	_,trans := GetreadyInfo("Transaction", r.FormValue("username"))
 	json.NewEncoder(w).Encode(trans)
@@ -72,13 +74,14 @@ func GetBuys(w http.ResponseWriter, r *http.Request) {
 }
 
 func UserbuyMedicine(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	var tran based.Transaction
 	json.NewDecoder(r.Body).Decode(&tran)
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	BuyMedicine(tran)
 	fmt.Fprint(w,http.StatusOK)
 }
+
 
 func GetBlockchain(w http.ResponseWriter, r *http.Request)  {
 	w.Header().Set("Access-Control-Allow-Origin", "*")

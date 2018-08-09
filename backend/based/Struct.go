@@ -166,7 +166,7 @@ func deserializeDatabuy(d []byte) *Data_buy {
 	return dt
 }
 
-func (b *Presciption)serialize() []byte {
+func (b *Presciption)Serialize() []byte {
 	var result bytes.Buffer
 	temp := new(presciption)
 
@@ -208,7 +208,7 @@ func deserializePrescription(d []byte) *Presciption {
 	return dp
 }
 
-func (b *Transaction)serialize() []byte {
+func (b *Transaction)Serialize() []byte {
 	var result bytes.Buffer
 	temp := new(transaction)
 
@@ -266,7 +266,7 @@ func deserializeDose(d []byte) *Dose {
 	return dt
 }
 
-func (b *Buy)serialize() []byte {
+func (b *Buy)Serialize() []byte {
 	var result bytes.Buffer
 	temp := new(buy)
 

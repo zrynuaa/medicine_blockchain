@@ -117,7 +117,7 @@ func TestSplitBytesbyn(t *testing.T) {
 	one.Ts = 4862
 	one.Policy = "SDA ADN DA"
 	one.Type = 0
-	tid, err := PutIntoFabric("0", "123456", one.serialize())
+	tid, err := PutIntoFabric("0", "123456", one.Serialize())
 	if err != nil {
 		fmt.Println(err)
 		return
