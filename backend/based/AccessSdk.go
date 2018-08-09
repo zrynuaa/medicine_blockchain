@@ -11,7 +11,7 @@ import (
 const delta  = time.Minute
 var LastId = []string{"","",""}
 var whatmap = map[int]string{
-	0: "presciption",
+	0: "prescription",
 	1: "transaction",
 	2: "buy",
 }

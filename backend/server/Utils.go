@@ -69,7 +69,7 @@ func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 	//prePolicy := "hid1 OR (cid AND rid1)"
 	prePolicy := "cid rid1 2of2 hid1 1of2"
 
-	var ptot based.Presciption
+	var ptot based.Prescription
 	ptot.Type = 0
 	ptot.Hospital_id = pre.Hospital_id
 	ptot.Patient_id = pre.Patient_id
@@ -98,12 +98,12 @@ func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 			easypreid = easypreid[:len(easypreid)-2]
 		}
 		easypreid += "_" + strconv.Itoa(i+1)
-		ptot.Presciption_id = easypreid
-		fmt.Println(ptot.Presciption_id)
+		ptot.Prescription_id = easypreid
+		fmt.Println(ptot.Prescription_id)
 
 		//加密后存储到链上
 		preencdata := bswabe.SerializeBswabeCphKey(bswabe.CP_Enc(pub, string(ptot.Serialize()),ptot.Policy))
-		_, err := based.PutIntoFabric("0", ptot.Presciption_id, preencdata)
+		_, err := based.PutIntoFabric("0", ptot.Prescription_id, preencdata)
 		if err != nil {
 			fmt.Println(err)
 			return false
@@ -129,7 +129,7 @@ func StoregetMInfo(store Drugstore) []Transaction {
 
 		for _,name := range mname {
 			tran.Data = new(based.Data_tran)
-			tran.Data.Presciption_id = pres[i].Presciption_id
+			tran.Data.Prescription_id = pres[i].Presciption_id
 			tran.Data.Ts = pres[i].Ts
 			tran.Data.Site = store.Location
 
@@ -140,13 +140,13 @@ func StoregetMInfo(store Drugstore) []Transaction {
 
 			//药方已处理时,该药品信息不能操作.药方未处理时,查看链上是否存在该药品信息,若存在则不能操作
 			if based.IsBuy(pres[i].Presciption_id, "*", "*") {
-				if based.IsBuy(tran.Data.Presciption_id,store.Location,name) {
+				if based.IsBuy(tran.Data.Prescription_id,store.Location,name) {
 					tran.Ishandled = 3		//该药品是该药店卖的
 				}else {
 					tran.Ishandled = 2
 				}
 			}else {
-				if based.IsPostdata(tran.Data.Presciption_id, store.Location, name) {
+				if based.IsPostdata(tran.Data.Prescription_id, store.Location, name) {
 					tran.Ishandled = 1
 				}else {
 					tran.Ishandled = 0
@@ -205,7 +205,7 @@ func BuyMedicine(tran based.Transaction)  {
 	buy.Type = 2
 	buy.Patient_id = tran.Patient_id
 
-	buy.Data = &based.Data_buy{Presciption_id:data.Presciption_id, Medicine_name:data.Medicine_name, Medicine_amount:data.Amount, Medicine_price:data.Price,Site:data.Site}
+	buy.Data = &based.Data_buy{Prescription_id:data.Prescription_id, Medicine_name:data.Medicine_name, Medicine_amount:data.Amount, Medicine_price:data.Price,Site:data.Site}
 	buy.Data.Ts = uint64(time.Now().Unix())
 	based.PutBuy(buy)
 }

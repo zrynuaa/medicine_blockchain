@@ -28,8 +28,8 @@ func GetFromDbById(types string, id string) ([]byte, error){
 }
 
 //从db中获取pre信息，filter为map，示例见test，下同
-func GetPreFromDbByFilter(fil map[string]string) ([]*Presciption, error){
-	var result []*Presciption
+func GetPreFromDbByFilter(fil map[string]string) ([]*Prescription, error){
+	var result []*Prescription
 	var flag bool
 	all, err := getAllFromDb("prescription")
 	if err != nil {
@@ -68,7 +68,7 @@ func GetTraFromDbByFilter(fil map[string]string) ([]*Transaction, error){
 		flag = true
 		if fil != nil {
 			for k, v := range fil {
-				if (k == "preid" && v == temp.Data.Presciption_id) ||
+				if (k == "preid" && v == temp.Data.Prescription_id) ||
 					(k == "site" && v == temp.Data.Site) || (k == "medicine" && v == temp.Data.Medicine_name) {
 					continue
 				}
@@ -96,7 +96,7 @@ func GetBuyFromDbByFilter(fil map[string]string) ([]*Buy, error){
 		flag = true
 		if fil != nil {
 			for k, v := range fil {
-				if (k == "preid" && v == temp.Data.Presciption_id) || (k == "patid" && v == temp.Patient_id) ||
+				if (k == "preid" && v == temp.Data.Prescription_id) || (k == "patid" && v == temp.Patient_id) ||
 					(k == "site" && v == temp.Data.Site) || (k == "medicine" && v == temp.Data.Medicine_name) {
 					continue
 				}

@@ -39,6 +39,6 @@ type Transaction struct {
 }
 
 type Presciption struct {
-	Data *based.Presciption `json:"data"`
-	Isbuy int `json:"isbuy"`		//0处方为处理, 1处方已处理
+	Data *based.Prescription `json:"data"`
+	Isbuy int                `json:"isbuy"`		//0处方为处理, 1处方已处理
 }
