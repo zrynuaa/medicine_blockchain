@@ -128,7 +128,7 @@ func StoregetMInfo(store Drugstore) []Transaction {
 
 		for _,name := range mname {
 			tran.Data = new(based.Data_tran)
-			tran.Data.Prescription_id = pres[i].Presciption_id
+			tran.Data.Prescription_id = pres[i].Prescription_id
 			tran.Data.Ts = pres[i].Ts
 			tran.Data.Site = store.Location
 
@@ -138,16 +138,16 @@ func StoregetMInfo(store Drugstore) []Transaction {
 			tran.Data.Price = totalprice
 
 			//药方已处理时,该药品信息不能操作.药方未处理时,查看链上是否存在该药品信息,若存在则不能操作
-			if IsBuy(pres[i].Presciption_id, "", "") {
+			if IsBuy(pres[i].Prescription_id, "", "") {
 				//处方已经被处理
-				if IsBuy(tran.Data.Presciption_id,store.Location,name) {
+				if IsBuy(tran.Data.Prescription_id,store.Location,name) {
 					tran.Ishandled = 3		//该药品是该药店卖的
 				}else {
 					tran.Ishandled = 2		//别的药店卖出去的
 				}
 			}else {
 				//处方未被处理
-				if IsPostdata(tran.Data.Presciption_id, store.Location, name) {
+				if IsPostdata(tran.Data.Prescription_id, store.Location, name) {
 					tran.Ishandled = 1		//处方还没结束，但是已经接单
 				}else {
 					tran.Ishandled = 0		//还没有接单

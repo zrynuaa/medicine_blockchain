@@ -45,7 +45,6 @@ type Transaction struct {
 	Type int `json:"type"`
 	Transaction_id string `json:"transaction_id"`
 	Patient_id string `json:"patient_id"`
-	Ts uint64 `json:"ts"`
 	Data *Data_tran `json:"data"`
 }
 
