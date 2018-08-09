@@ -1,6 +1,6 @@
 package server
 
-import "github.com/scottocs/medicine_blockchain/backend/based"
+import "github.com/zrynuaa/medicine_blockchain/backend/based"
 
 type Chemistry struct {
 	Chemistry_name string 	`json:"chemistry_name"` //化学名

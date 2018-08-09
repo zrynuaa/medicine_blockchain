@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/scottocs/medicine_blockchain/backend/based"
+	"github.com/zrynuaa/medicine_blockchain/backend/based"
 	"encoding/json"
 	//"crypto/md5"
 	"fmt"
@@ -73,6 +73,7 @@ func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 		easypreid += "_" + strconv.Itoa(i+1)
 		ptot.Presciption_id = easypreid
 
+		
 		based.PutPrescription(ptot)//处方上链
 	}
 	return true
