@@ -68,7 +68,7 @@ func GetTraFromDbByFilter(fil map[string]string) ([]*Transaction, error){
 		flag = true
 		if fil != nil {
 			for k, v := range fil {
-				if (k == "preid" && v == temp.Data.Prescription_id) ||
+				if (k == "preid" && v == temp.Data.Prescription_id) || (k == "patid" && v == temp.Patient_id) ||
 					(k == "site" && v == temp.Data.Site) || (k == "medicine" && v == temp.Data.Medicine_name) {
 					continue
 				}
