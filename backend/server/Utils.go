@@ -129,7 +129,7 @@ func StoregetMInfo(store Drugstore) []Transaction {
 		for _,name := range mname {
 			tran.Data = new(based.Data_tran)
 			tran.Data.Prescription_id = pres[i].Prescription_id
-			tran.Data.Ts = pres[i].Ts
+			tran.Data.Ts = uint64(time.Now().Unix())
 			tran.Data.Site = store.Location
 
 			tran.Data.Medicine_name = name
@@ -167,7 +167,7 @@ func StoresendTransaction(tran Transaction)  {
 	ttot.Type = 1
 	ttot.Patient_id = tran.Patient_id
 	ttot.Data = tran.Data
-	ttot.Ts = uint64(time.Now().Unix())
+	ttot.Data.Ts = uint64(time.Now().Unix())
 
 	buf,_ := json.Marshal(ttot)
 	digest := SM3.SM3_256(buf)
@@ -181,32 +181,33 @@ func StoresendTransaction(tran Transaction)  {
 }
 
 //获取链上数据
-//func GetreadyInfo(mark, username string) ([]Presciption, []Transaction) {
-//	if mark == "Prescription"{
-//		var pres []Presciption
-//		for _,v := range based.GetPrescriptionByid(username){
-//			pre := new(Presciption)
-//			pre.Data = v
-//			if based.IsBuy(v.Presciption_id,"*","*"){
-//				pre.Isbuy = 1
-//			}
-//			pres = append(pres, *pre)
-//		}
-//		return pres,nil
-//	}else {
-//		var trans []Transaction
-//		for _,v := range based.GetTransactionByid(username){
-//			tran := new(Transaction)
-//			tran.Data = v.Data
-//			tran.Patient_id = v.Patient_id
-//			if based.IsBuy(v.Data.Presciption_id,"*","*"){
-//				tran.Ishandled = 2
-//			}
-//			trans = append(trans, *tran)
-//		}
-//		return nil,trans
-//	}
-//}
+func GetreadyInfo(mark, username string) ([]Presciption, []Transaction) {
+	if mark == "Prescription"{
+		var pres []Presciption
+		for _,v := range based.GetPrescriptionByid(username){
+			pre := new(Presciption)
+			pre.Data = v
+			if IsBuy(v.Prescription_id,"*","*"){
+				pre.Isbuy = 1
+			}
+			pres = append(pres, *pre)
+		}
+		return pres,nil
+	}else {
+		var trans []Transaction
+		for _,v := range based.GetTransactionByid(username){
+			tran := new(Transaction)
+			tran.Data = v.Data
+			tran.Patient_id = v.Patient_id
+			if based.IsBuy(v.Data.Presciption_id,"*","*"){
+				tran.Ishandled = 2
+			}
+			trans = append(trans, *tran)
+		}
+		return nil,trans
+	}
+}
+
 //用户通过监管节点买药,发布买药信息
 func BuyMedicine(tran based.Transaction)  {
 	var buy based.Buy
