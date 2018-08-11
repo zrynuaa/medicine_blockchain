@@ -10,17 +10,17 @@ func TestPrescriptiontoTransaction(t *testing.T) {
 	//based.Setup()
 	GetABEPub() //获取ABE服务上的公钥
 	hp := HospitalPrescription{
-		Hospital_id:"zhongshan",
+		Hospital_id:"huashan",
 		Patient_id:"111",
 		Doctor_id:"1",
 		Disease:"fever",
 		Chemistrys:[]Chemistry{
 			{
-				Chemistry_name:"cid1",
+				Chemistry_name:"cid3",
 				Amount:2,
 			},
 			{
-				Chemistry_name:"cid2",
+				Chemistry_name:"cid4",
 				Amount:3,
 			},
 		},
@@ -32,14 +32,26 @@ func TestPrescriptiontoTransaction(t *testing.T) {
 
 	all,_ := based.GetPreFromDbByFilter(nil)
 	for _,v := range all{
-		fmt.Println(v)
+		fmt.Println(v, v.Data)
 	}
+}
+
+func TestStoregetMInfo(t *testing.T) {
+	drugstore1 := SetStore1Attrs()
+
+	trans := StoregetMInfo(drugstore1)
+
+	for _,v := range trans{
+		fmt.Println(v, v.Data)
+	}
+}
+
+func TestAddDoses(t *testing.T) {
+	AddDoses()
+	based.GetDoseFromDb("mid1","cid1",2)
 }
 
 func TestGetBuys(t *testing.T) {
 
 }
 
-func TestGetPrescriptions(t *testing.T) {
-
-}

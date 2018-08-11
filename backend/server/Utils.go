@@ -59,9 +59,9 @@ func AddDoses()  {
 	d12 := based.Dose{Medicine_name:"mid12", Chemistry_name:"cid7", Medicine_amount:1, Medicine_price:3.7}
 
 	var dose []based.Dose
-	dose = append(dose, d1, d2, d3, d4, d5, d6,d7,d8,d9,d10,d11,d12)
+	dose = append(dose, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12)
 	for k,v := range dose {
-		based.PutIntoDb("4", string(k), v.Serialize())
+		based.PutIntoDb("dose", string(k), v.Serialize())
 	}
 }
 
@@ -101,7 +101,7 @@ func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 		}
 		easypreid += "_" + strconv.Itoa(i+1)
 		ptot.Prescription_id = easypreid
-		fmt.Println(ptot.Prescription_id)
+		fmt.Println(ptot.Prescription_id, ptot)
 
 		//加密后存储到链上
 		preencdata := bswabe.SerializeBswabeCphKey(bswabe.CP_Enc(pub, string(ptot.Serialize()),ptot.Policy))
@@ -179,7 +179,7 @@ func StoresendTransaction(tran Transaction)  {
 	//todo policy,药品信息只让本药店以及服务节点能看到，所以只用一个属性，药店id--sid
 	tranencdata := bswabe.SerializeBswabeCphKey(bswabe.CP_Enc(pub, string(ttot.Serialize()),"sid1"))
 
-	based.PutIntoDb("1",ttot.Transaction_id,tranencdata)
+	based.PutIntoFabric("1",ttot.Transaction_id,tranencdata)
 }
 
 //获取链上数据
@@ -244,7 +244,7 @@ func BuyMedicine(tran based.Transaction)  {
 	//todo policy
 	buyencdata := bswabe.SerializeBswabeCphKey(bswabe.CP_Enc(pub, string(buy.Serialize()),policy))
 
-	based.PutIntoDb("2",buy.Buy_id,buyencdata)
+	based.PutIntoFabric("2",buy.Buy_id,buyencdata)
 
 }
 
