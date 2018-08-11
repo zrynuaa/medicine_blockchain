@@ -136,7 +136,10 @@ func getAllFromDb(types string) ([][]byte, error) {
 	var result [][]byte
 	iter := db.NewIterator(util.BytesPrefix(commandToBytes(types)), nil)
 	for iter.Next() {
-		result = append(result, iter.Value())
+		length := len(iter.Value())
+		var temp = make([]byte, length, length)
+		copy(temp, iter.Value())
+		result = append(result, temp)
 	}
 	iter.Release()
 	err := iter.Error()

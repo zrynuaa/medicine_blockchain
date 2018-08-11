@@ -37,6 +37,8 @@ func TestPrescriptiontoTransaction(t *testing.T) {
 }
 
 func TestStoregetMInfo(t *testing.T) {
+	GetABEPub()
+	based.Init("zry",pub,prv)
 	drugstore1 := SetStore1Attrs()
 
 	trans := StoregetMInfo(drugstore1)
@@ -47,8 +49,10 @@ func TestStoregetMInfo(t *testing.T) {
 }
 
 func TestAddDoses(t *testing.T) {
+	GetABEPub()
+	based.Init("zry",pub,prv)
 	AddDoses()
-	based.GetDoseFromDb("mid1","cid1",2)
+	fmt.Println(based.GetDoseFromDb("mid1","cid1",2))
 }
 
 func TestGetBuys(t *testing.T) {
