@@ -11,7 +11,7 @@ import (
 //新增的test
 func TestSplitBytesbyn(t *testing.T) {
 	Name = "czn"
-	Db,_ = leveldb.OpenFile("./db/" + Name + ".db", nil)
+	db,_ = leveldb.OpenFile("./db/" + Name + ".db", nil)
 	Setup()
 	go TimingAccess()
 	var one = new(Prescription)

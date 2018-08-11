@@ -1,42 +1,11 @@
 package based
 
 import (
-	"os"
-	"github.com/thorweiyan/fabric_go_sdk"
 	"fmt"
 	"time"
 	"strconv"
+	"github.com/zrynuaa/cpabe06_client/bswabe"
 )
-
-const delta  = time.Minute
-var LastId = []string{"","",""}
-var whatmap = map[int]string{
-	0: "prescription",
-	1: "transaction",
-	2: "buy",
-}
-// Definition of the Fabric SDK properties
-var fSetup = fabric_go_sdk.FabricSetup{
-	// Network parameters
-	OrdererID: "orderer.fudan.edu.cn",
-	OrgID:     "org1.fudan.edu.cn",
-
-	// Channel parameters
-	ChannelID:     "fudanfabric",
-	ChannelConfig: os.Getenv("GOPATH") + "/src/github.com/thorweiyan/fabric_go_sdk/fixtures/artifacts/fudanfabric.channel.tx",
-
-	// Chaincode parameters
-	ChainCodeID:      "fudancc",
-	ChaincodeGoPath:  os.Getenv("GOPATH"),
-	ChaincodePath:    "github.com/zrynuaa/medicine_blockchain/backend/chaincode/",
-	ChaincodeVersion: "0",
-	OrgAdmin:         "Admin",
-	OrgName:          "org1",
-	ConfigFile:       os.Getenv("GOPATH") + "/src/github.com/thorweiyan/fabric_go_sdk/config.yaml",
-
-	// User parameters
-	UserName: "User1",
-}
 
 //初始化，只在一开始调用一次
 func Setup() {
@@ -122,20 +91,31 @@ func synchronize(what int) error {
 	if err != nil {
 		return fmt.Errorf("syschronizeLastId error:%s", err)
 	}
-	tempids := splitStringbyn(idspayload)
-	temppres := splitStringbyn(prespayload)
+	tempencids := splitStringbyn(idspayload)
+	tempencpres := splitStringbyn(prespayload)
 	//去掉最后的空字符串
-	tempids = tempids[:len(tempids)-1]
-	temppres = temppres[:len(temppres)-1]
+	tempencids = tempencids[:len(tempencids)-1]
+	tempencpres = tempencpres[:len(tempencpres)-1]
 	//更新lastid
-	if len(tempids) == 0 {
+	if len(tempencids) == 0 {
 		return nil
 	}
+	//dec
+	var tempids []string
+	var temppres [][]byte
+	for i, j := range tempencpres {
+		result := bswabe.CP_Dec(pk, sk, bswabe.UnSerializeBswabeCphKey(pk, []byte(j)))
+		if string(result) == "" {
+			continue
+		}
+		tempids = append(tempids, tempencids[i])
+		temppres = append(temppres, result)
+	}
+	//update db
 	LastId[what] = tempids[len(tempids)-1]
 	types := whatmap[what]
-	//update db
 	for i, j := range tempids {
-		err := PutIntoDb(types, j, []byte(temppres[i]))
+		err := PutIntoDb(types, j, temppres[i])
 		if err != nil {
 			return fmt.Errorf("syschronizeLastId error:%s", err)
 		}

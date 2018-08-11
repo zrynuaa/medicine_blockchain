@@ -1,16 +1,13 @@
 package based
 
 import (
-	"github.com/syndtr/goleveldb/leveldb"
 	//"fmt"
 	//"github.com/Doresimon/SM-Collection/SM3"
 	"fmt"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
-var Name string = "default"
-var Db *leveldb.DB
-const commandLength = 11
+
 
 //输入类型what，0代表pre，1代表tran，2代表buy，id和value
 func PutIntoFabric(what string, id string, value []byte) (string,error){
@@ -20,7 +17,7 @@ func PutIntoFabric(what string, id string, value []byte) (string,error){
 //types有prescription，transaction，buy
 func GetFromDbById(types string, id string) ([]byte, error){
 	key := append(commandToBytes(types), []byte(id)...)
-	data, err := Db.Get(key, nil)
+	data, err := db.Get(key, nil)
 	if err != nil {
 		return []byte(""), fmt.Errorf("getFromDbById error, type:%s, id:%s\n", types, id)
 	}
@@ -137,7 +134,7 @@ func GetDoseFromDb(medicine_name string, chemistry_name string, chemistry_amount
 
 func getAllFromDb(types string) ([][]byte, error) {
 	var result [][]byte
-	iter := Db.NewIterator(util.BytesPrefix(commandToBytes(types)), nil)
+	iter := db.NewIterator(util.BytesPrefix(commandToBytes(types)), nil)
 	for iter.Next() {
 		result = append(result, iter.Value())
 	}
@@ -163,7 +160,7 @@ func commandToBytes(command string) []byte {
 func PutIntoDb(types string, id string, value []byte) error{
 	var key []byte
 	key = append(commandToBytes(types), []byte(id)...)
-	err := Db.Put(key, value, nil)
+	err := db.Put(key, value, nil)
 	if err != nil {
 		return fmt.Errorf("PutIntoDb error!%s", err)
 	}

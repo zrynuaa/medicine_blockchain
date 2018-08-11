@@ -7,6 +7,7 @@ import (
 )
 
 func TestPrescriptiontoTransaction(t *testing.T) {
+	//based.Setup()
 	GetABEPub() //获取ABE服务上的公钥
 	hp := HospitalPrescription{
 		Hospital_id:"zhongshan",
@@ -26,8 +27,9 @@ func TestPrescriptiontoTransaction(t *testing.T) {
 	}
 
 	PrescriptiontoTransaction(hp) //将处方信息存到链上
-
+	based.Init("zry",pub,prv)
 	based.QuickAccess() //马上获取新的链上信息
+
 	all,_ := based.GetPreFromDbByFilter(nil)
 	for _,v := range all{
 		fmt.Println(v)
