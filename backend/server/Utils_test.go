@@ -27,7 +27,7 @@ func TestPrescriptiontoTransaction(t *testing.T) {
 
 	PrescriptiontoTransaction(hp) //将处方信息存到链上
 
-	//based.QuickAccess()
+	based.QuickAccess() //马上获取新的链上信息
 	all,_ := based.GetPreFromDbByFilter(nil)
 	for _,v := range all{
 		fmt.Println(v)

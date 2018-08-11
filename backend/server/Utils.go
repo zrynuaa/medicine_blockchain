@@ -15,11 +15,13 @@ import (
 	"log"
 )
 
+//todo 1、卖药信息以及卖药信息的policy怎么设置		2、怎么封装成单节点
+
 var pub *bswabe.BswabePub
 var prv *bswabe.BswabePrv
 var attrs = "cid1 cid2 cid3 cid4 cid5 cid6 cid7 cid8 cid9 cid10 rid1" //节点属性
 
-//获取ABE服务器上的主公钥 √√√
+//获取ABE服务器上的主公钥
 func GetABEPub() {
 	client, err := rpc.DialHTTP("tcp", "10.141.211.220:1234")
 	if err != nil {
@@ -63,7 +65,7 @@ func AddDoses()  {
 	}
 }
 
-//医院发布处方信息 √√√
+//医院发布处方信息
 func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 
 	//prePolicy := "hid1 OR (cid AND rid1)"
@@ -174,8 +176,8 @@ func StoresendTransaction(tran Transaction)  {
 	tranid := fmt.Sprintf("%x", digest)
 	ttot.Transaction_id = tranid
 
-	//todo policy
-	tranencdata := bswabe.SerializeBswabeCphKey(bswabe.CP_Enc(pub, string(ttot.Serialize()),""))
+	//todo policy,药品信息只让本药店以及服务节点能看到，所以只用一个属性，药店id--sid
+	tranencdata := bswabe.SerializeBswabeCphKey(bswabe.CP_Enc(pub, string(ttot.Serialize()),"sid1"))
 
 	based.PutIntoDb("1",ttot.Transaction_id,tranencdata)
 }
@@ -184,10 +186,14 @@ func StoresendTransaction(tran Transaction)  {
 func GetreadyInfo(mark, username string) ([]Presciption, []Transaction) {
 	if mark == "Prescription"{
 		var pres []Presciption
-		for _,v := range based.GetPrescriptionByid(username){
+		fil := make(map[string]string)
+		fil["patid"] = username
+		preget,_ := based.GetPreFromDbByFilter(fil)
+
+		for _,v := range preget{
 			pre := new(Presciption)
 			pre.Data = v
-			if IsBuy(v.Prescription_id,"*","*"){
+			if IsBuy(v.Prescription_id,"",""){
 				pre.Isbuy = 1
 			}
 			pres = append(pres, *pre)
@@ -195,11 +201,15 @@ func GetreadyInfo(mark, username string) ([]Presciption, []Transaction) {
 		return pres,nil
 	}else {
 		var trans []Transaction
-		for _,v := range based.GetTransactionByid(username){
+		fil := make(map[string]string)
+		fil["patid"] = username
+		tranget,_ := based.GetTraFromDbByFilter(fil)
+
+		for _,v := range tranget{
 			tran := new(Transaction)
 			tran.Data = v.Data
 			tran.Patient_id = v.Patient_id
-			if based.IsBuy(v.Data.Presciption_id,"*","*"){
+			if IsBuy(v.Data.Prescription_id,"",""){
 				tran.Ishandled = 2
 			}
 			trans = append(trans, *tran)
@@ -218,7 +228,24 @@ func BuyMedicine(tran based.Transaction)  {
 
 	buy.Data = &based.Data_buy{Prescription_id:data.Prescription_id, Medicine_name:data.Medicine_name, Medicine_amount:data.Amount, Medicine_price:data.Price,Site:data.Site}
 	buy.Data.Ts = uint64(time.Now().Unix())
-	//based.PutBuy(buy)
+
+	buf,_ := json.Marshal(buy)
+	digest := SM3.SM3_256(buf)
+	buyid := fmt.Sprintf("%x", digest)
+	buy.Buy_id = buyid
+
+	fil := make(map[string]string)
+	fil["preid"] = buy.Data.Prescription_id
+	pre,_ := based.GetPreFromDbByFilter(fil)
+
+	prePolicy := "cid rid1 2of2 hid1 1of2"
+	policy := strings.Replace(prePolicy,"cid", pre[0].Data.Chemistry_name, -1)
+
+	//todo policy
+	buyencdata := bswabe.SerializeBswabeCphKey(bswabe.CP_Enc(pub, string(buy.Serialize()),policy))
+
+	based.PutIntoDb("2",buy.Buy_id,buyencdata)
+
 }
 
 func AddHandletoServer(server *http.ServeMux, filename string)  {

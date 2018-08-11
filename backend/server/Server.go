@@ -57,15 +57,14 @@ func Sethandle(w http.ResponseWriter, r *http.Request)  {
 
 func GetPrescriptions(w http.ResponseWriter, r *http.Request)  {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	//pres,_ := GetreadyInfo("Prescription", r.FormValue("username"))
-	//json.NewEncoder(w).Encode(pres)
+	pres,_ := GetreadyInfo("Prescription", r.FormValue("username"))
+	json.NewEncoder(w).Encode(pres)
 }
 
 func GetTransactions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	// trans,_ := GetreadyInfo("Transaction", r.FormValue("username"))
-	//_,trans := GetreadyInfo("Transaction", r.FormValue("username"))
-	//json.NewEncoder(w).Encode(trans)
+	_,trans := GetreadyInfo("Transaction", r.FormValue("username"))
+	json.NewEncoder(w).Encode(trans)
 }
 
 func GetBuys(w http.ResponseWriter, r *http.Request) {
