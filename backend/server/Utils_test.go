@@ -9,10 +9,12 @@ import (
 func TestPrescriptiontoTransaction(t *testing.T) {
 	//based.Setup()
 	GetABEKeys() //获取ABE服务上的密钥对
+	based.Init("zry",pub,prv)
+
 	hp := HospitalPrescription{
-		Hospital_id:"huashan",
-		Patient_id:"111",
-		Doctor_id:"1",
+		Hospital_id:"xiehe",
+		Patient_id:"111222",
+		Doctor_id:"123",
 		Disease:"fever",
 		Chemistrys:[]Chemistry{
 			{
@@ -27,7 +29,6 @@ func TestPrescriptiontoTransaction(t *testing.T) {
 	}
 
 	PrescriptiontoTransaction(hp) //将处方信息存到链上
-	based.Init("zry",pub,prv)
 	based.QuickAccess() //马上获取新的链上信息
 
 	all,_ := based.GetPreFromDbByFilter(nil)
@@ -70,9 +71,48 @@ func TestStoresendTransaction(t *testing.T) {
 		}
 	}
 
+	based.QuickAccess() //马上获取新的链上信息
 	all,_ := based.GetTraFromDbByFilter(nil)
 	for _,v := range all{
 		fmt.Println(v, v.Data)
 	}
+}
+
+func TestGetreadyInfo(t *testing.T) {
+	GetABEKeys() //获取ABE服务上的密钥对
+	based.Init("zry",pub,prv)
+	//based.QuickAccess() //马上获取新的链上信息
+
+	fmt.Println("所有能解密的处方信息")
+	pres,_ := based.GetPreFromDbByFilter(nil)
+	for _,v := range pres{
+		fmt.Println(v, v.Data)
+	}
+
+	fmt.Println("所有能解密的药品信息（药店卖药信息）")
+	trans,_ := based.GetTraFromDbByFilter(nil)
+	for _,v := range trans{
+		fmt.Println(v, v.Data)
+	}
+
+	fmt.Println("所有能解密的用户买药信息")
+	buys,_ := based.GetBuyFromDbByFilter(nil)
+	for _,v := range buys{
+		fmt.Println(v, v.Data)
+	}
+
+}
+
+func TestBuyMedicine(t *testing.T) {
+	GetABEKeys() //获取ABE服务上的密钥对
+	based.Init("zry",pub,prv)
+
+	fmt.Println("所有能解密的药品信息（药店卖药信息）")
+	trans,_ := based.GetTraFromDbByFilter(nil)
+	for _,v := range trans{
+		fmt.Println(v, v.Data)
+	}
+
+	BuyMedicine(*trans[0])
 }
 

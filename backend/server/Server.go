@@ -57,19 +57,20 @@ func Sethandle(w http.ResponseWriter, r *http.Request)  {
 
 func GetPrescriptions(w http.ResponseWriter, r *http.Request)  {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	pres,_ := GetreadyInfo("Prescription", r.FormValue("username"))
+	pres,_,_ := GetreadyInfo("Prescription", r.FormValue("username"))
 	json.NewEncoder(w).Encode(pres)
 }
 
 func GetTransactions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	_,trans := GetreadyInfo("Transaction", r.FormValue("username"))
+	_,trans,_ := GetreadyInfo("Transaction", r.FormValue("username"))
 	json.NewEncoder(w).Encode(trans)
 }
 
 func GetBuys(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	//json.NewEncoder(w).Encode(based.GetBuyByid(r.FormValue("username")))
+	_,_,buys := GetreadyInfo("Buy", r.FormValue("username"))
+	json.NewEncoder(w).Encode(buys)
 }
 
 func UserbuyMedicine(w http.ResponseWriter, r *http.Request) {
@@ -79,12 +80,6 @@ func UserbuyMedicine(w http.ResponseWriter, r *http.Request) {
 
 	BuyMedicine(tran)
 	fmt.Fprint(w,http.StatusOK)
-}
-
-
-func GetBlockchain(w http.ResponseWriter, r *http.Request)  {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	//json.NewEncoder(w).Encode(based.GetBlock())
 }
 
 func Run()  {
@@ -125,7 +120,6 @@ func Run()  {
 
 	server8885 := http.NewServeMux()
 	AddHandletoServer(server8885, "blockExplore.html")
-	server8885.HandleFunc("/getblockchain", GetBlockchain)
 
 	go http.ListenAndServe(":8880", server8880)
 	go http.ListenAndServe(":8881", server8881)

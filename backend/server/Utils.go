@@ -185,9 +185,9 @@ func StoresendTransaction(tran Transaction)  {
 }
 
 //获取链上数据
-func GetreadyInfo(mark, username string) ([]Presciption, []Transaction) {
+func GetreadyInfo(mark, username string) ([]*Presciption, []*Transaction, []*based.Buy) {
 	if mark == "Prescription"{
-		var pres []Presciption
+		var pres []*Presciption
 		fil := make(map[string]string)
 		fil["patid"] = username
 		preget,_ := based.GetPreFromDbByFilter(fil)
@@ -198,11 +198,11 @@ func GetreadyInfo(mark, username string) ([]Presciption, []Transaction) {
 			if IsBuy(v.Prescription_id,"",""){
 				pre.Isbuy = 1
 			}
-			pres = append(pres, *pre)
+			pres = append(pres, pre)
 		}
-		return pres,nil
-	}else {
-		var trans []Transaction
+		return pres,nil,nil
+	}else if mark == "Transaction"{
+		var trans []*Transaction
 		fil := make(map[string]string)
 		fil["patid"] = username
 		tranget,_ := based.GetTraFromDbByFilter(fil)
@@ -214,10 +214,17 @@ func GetreadyInfo(mark, username string) ([]Presciption, []Transaction) {
 			if IsBuy(v.Data.Prescription_id,"",""){
 				tran.Ishandled = 2
 			}
-			trans = append(trans, *tran)
+			trans = append(trans, tran)
 		}
-		return nil,trans
+		return nil,trans,nil
+	}else if mark == "Buy"{
+		fil := make(map[string]string)
+		fil["patid"] = username
+		buysget,_ := based.GetBuyFromDbByFilter(fil)
+
+		return nil,nil,buysget
 	}
+	return nil,nil,nil
 }
 
 //用户通过监管节点买药,发布买药信息
@@ -236,12 +243,12 @@ func BuyMedicine(tran based.Transaction)  {
 	buyid := fmt.Sprintf("%x", digest)
 	buy.Buy_id = buyid
 
-	fil := make(map[string]string)
-	fil["preid"] = buy.Data.Prescription_id
-	pre,_ := based.GetPreFromDbByFilter(fil)
+	//todo 需要获得这个处方id回应的处方，来获得该处方的化学名，进而构造policy
+	predata,_ := based.GetFromDbById("", buy.Data.Prescription_id)
+	pre := based.DeserializePrescription(predata)
 
 	prePolicy := "cid rid1 2of2 hid1 1of2"
-	policy := strings.Replace(prePolicy,"cid", pre[0].Data.Chemistry_name, -1)
+	policy := strings.Replace(prePolicy,"cid", pre.Data.Chemistry_name, -1)
 
 	//todo policy
 	buyencdata := bswabe.SerializeBswabeCphKey(bswabe.CP_Enc(pub, string(buy.Serialize()),policy))
@@ -280,7 +287,7 @@ func IsBuy(Presciption_id, Location, name string) bool {
 		fil["medicine"] = name
 	}
 
-	trans, _ := based.GetPreFromDbByFilter(fil)
+	trans, _ := based.GetBuyFromDbByFilter(fil)
 	if trans != nil {
 		return true
 	}
