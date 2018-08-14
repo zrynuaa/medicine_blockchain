@@ -19,10 +19,10 @@ import (
 
 var pub *bswabe.BswabePub
 var prv *bswabe.BswabePrv
-var attrs = "cid1 cid2 cid3 cid4 cid5 cid6 cid7 cid8 cid9 cid10 rid1" //节点属性
+var attrs = "cid1 cid2 cid3 cid4 cid5 cid6 cid7 cid8 cid9 cid10 rid1 sid1" //节点属性
 
 //获取ABE服务器上的主公钥
-func GetABEPub() {
+func GetABEKeys() {
 	client, err := rpc.DialHTTP("tcp", "10.141.211.220:1234")
 	if err != nil {
 		log.Fatal("dialing:", err)
@@ -178,8 +178,10 @@ func StoresendTransaction(tran Transaction)  {
 
 	//todo policy,药品信息只让本药店以及服务节点能看到，所以只用一个属性，药店id--sid
 	tranencdata := bswabe.SerializeBswabeCphKey(bswabe.CP_Enc(pub, string(ttot.Serialize()),"sid1"))
-
-	based.PutIntoFabric("1",ttot.Transaction_id,tranencdata)
+	_, err := based.PutIntoFabric("1", ttot.Transaction_id, tranencdata)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 //获取链上数据

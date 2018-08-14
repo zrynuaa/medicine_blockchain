@@ -8,7 +8,7 @@ import (
 
 func TestPrescriptiontoTransaction(t *testing.T) {
 	//based.Setup()
-	GetABEPub() //获取ABE服务上的公钥
+	GetABEKeys() //获取ABE服务上的密钥对
 	hp := HospitalPrescription{
 		Hospital_id:"huashan",
 		Patient_id:"111",
@@ -17,11 +17,11 @@ func TestPrescriptiontoTransaction(t *testing.T) {
 		Chemistrys:[]Chemistry{
 			{
 				Chemistry_name:"cid3",
-				Amount:2,
+				Amount:5,
 			},
 			{
 				Chemistry_name:"cid4",
-				Amount:3,
+				Amount:1,
 			},
 		},
 	}
@@ -37,8 +37,9 @@ func TestPrescriptiontoTransaction(t *testing.T) {
 }
 
 func TestStoregetMInfo(t *testing.T) {
-	GetABEPub()
+	GetABEKeys()
 	based.Init("zry",pub,prv)
+	AddDoses()
 	drugstore1 := SetStore1Attrs()
 
 	trans := StoregetMInfo(drugstore1)
@@ -49,13 +50,29 @@ func TestStoregetMInfo(t *testing.T) {
 }
 
 func TestAddDoses(t *testing.T) {
-	GetABEPub()
+	GetABEKeys()
 	based.Init("zry",pub,prv)
 	AddDoses()
 	fmt.Println(based.GetDoseFromDb("mid1","cid1",2))
 }
 
-func TestGetBuys(t *testing.T) {
+func TestStoresendTransaction(t *testing.T) {
+	GetABEKeys()
+	based.Init("zry",pub,prv)
+	AddDoses()
 
+	drugstore1 := SetStore1Attrs()
+	trans := StoregetMInfo(drugstore1)
+
+	for _, v := range trans{
+		if v.Ishandled == 0 {		//未处理时，上传药品信息
+			StoresendTransaction(v)
+		}
+	}
+
+	all,_ := based.GetTraFromDbByFilter(nil)
+	for _,v := range all{
+		fmt.Println(v, v.Data)
+	}
 }
 
