@@ -76,12 +76,14 @@ type prescription struct {
 
 type transaction struct {
 	Type int
+	Transaction_id string
 	Patient_id string
 	Data_tran []byte
 }
 
 type buy struct {
 	Type int
+	Buy_id string
 	Data_buy []byte
 	Patient_id string
 }
@@ -206,6 +208,7 @@ func (b *Transaction)Serialize() []byte {
 
 	temp.Data_tran = b.Data.serialize()
 	temp.Patient_id = b.Patient_id
+	temp.Transaction_id = b.Transaction_id
 	temp.Type = b.Type
 
 	encoder := gob.NewEncoder(&result)
@@ -229,6 +232,7 @@ func deserializeTransaction(d []byte) *Transaction {
 
 	dp.Data = deserializeDatatran(dptemp.Data_tran)
 	dp.Patient_id = dptemp.Patient_id
+	dp.Transaction_id = dptemp.Transaction_id
 	dp.Type = dptemp.Type
 
 	return dp
@@ -264,6 +268,7 @@ func (b *Buy)Serialize() []byte {
 
 	temp.Data_buy = b.Data.serialize()
 	temp.Patient_id = b.Patient_id
+	temp.Buy_id = b.Buy_id
 	temp.Type = b.Type
 
 	encoder := gob.NewEncoder(&result)
@@ -287,6 +292,7 @@ func deserializeBuy(d []byte) *Buy {
 
 	dp.Data = deserializeDatabuy(dptemp.Data_buy)
 	dp.Patient_id = dptemp.Patient_id
+	dp.Buy_id = dptemp.Buy_id
 	dp.Type = dptemp.Type
 
 	return dp
