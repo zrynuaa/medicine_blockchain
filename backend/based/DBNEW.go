@@ -34,7 +34,7 @@ func GetPreFromDbByFilter(fil map[string]string) ([]*Prescription, error){
 	}
 
 	for _, one := range all {
-		temp := deserializePrescription(one)
+		temp := DeserializePrescription(one)
 		flag = true
 		if fil != nil {
 			for k, v := range fil {

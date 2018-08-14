@@ -243,8 +243,8 @@ func BuyMedicine(tran based.Transaction)  {
 	buyid := fmt.Sprintf("%x", digest)
 	buy.Buy_id = buyid
 
-	//todo 需要获得这个处方id回应的处方，来获得该处方的化学名，进而构造policy
-	predata,_ := based.GetFromDbById("", buy.Data.Prescription_id)
+	//todo 需要获得这个处方id对应的处方，来获得该处方的化学名，进而构造policy
+	predata,_ := based.GetFromDbById("prescription", buy.Data.Prescription_id)
 	pre := based.DeserializePrescription(predata)
 
 	prePolicy := "cid rid1 2of2 hid1 1of2"

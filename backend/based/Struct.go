@@ -181,7 +181,7 @@ func (b *Prescription)Serialize() []byte {
 	return result.Bytes()
 }
 
-func deserializePrescription(d []byte) *Prescription {
+func DeserializePrescription(d []byte) *Prescription {
 	dp := new(Prescription)
 	dptemp := new(prescription)
 

@@ -38,7 +38,7 @@ func TestSplitBytesbyn(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(deserializePrescription(res))
+	fmt.Println(DeserializePrescription(res))
 	fil := make(map[string]string)
 	fil["patid"] = "pat1"
 	res2, err :=GetPreFromDbByFilter(fil)
