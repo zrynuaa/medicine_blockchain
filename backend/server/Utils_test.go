@@ -7,22 +7,22 @@ import (
 )
 
 func TestPrescriptiontoTransaction(t *testing.T) {
-	//based.Setup()
+	//based.Setup() //整个系统启动只运行一次
 	GetABEKeys() //获取ABE服务上的密钥对
 	based.Init("zry",pub,prv)
 
 	hp := HospitalPrescription{
-		Hospital_id:"xiehe",
+		Hospital_id:"zhongshan",
 		Patient_id:"111222",
-		Doctor_id:"123",
+		Doctor_id:"123456",
 		Disease:"fever",
 		Chemistrys:[]Chemistry{
 			{
-				Chemistry_name:"cid3",
+				Chemistry_name:"cid1",
 				Amount:5,
 			},
 			{
-				Chemistry_name:"cid4",
+				Chemistry_name:"cid2",
 				Amount:1,
 			},
 		},
@@ -50,13 +50,6 @@ func TestStoregetMInfo(t *testing.T) {
 	}
 }
 
-func TestAddDoses(t *testing.T) {
-	GetABEKeys()
-	based.Init("zry",pub,prv)
-	AddDoses()
-	fmt.Println(based.GetDoseFromDb("mid1","cid1",2))
-}
-
 func TestStoresendTransaction(t *testing.T) {
 	GetABEKeys()
 	based.Init("zry",pub,prv)
@@ -78,10 +71,23 @@ func TestStoresendTransaction(t *testing.T) {
 	}
 }
 
+func TestBuyMedicine(t *testing.T) {
+	GetABEKeys() //获取ABE服务上的密钥对
+	based.Init("zry",pub,prv)
+
+	fmt.Println("所有能解密的药品信息（药店卖药信息）")
+	trans,_ := based.GetTraFromDbByFilter(nil)
+	for _,v := range trans{
+		fmt.Println(v, v.Data)
+	}
+
+	BuyMedicine(*trans[1])
+}
+
 func TestGetreadyInfo(t *testing.T) {
 	GetABEKeys() //获取ABE服务上的密钥对
 	based.Init("zry",pub,prv)
-	//based.QuickAccess() //马上获取新的链上信息
+	based.QuickAccess() //马上获取新的链上信息
 
 	fmt.Println("所有能解密的处方信息")
 	pres,_ := based.GetPreFromDbByFilter(nil)
@@ -101,18 +107,5 @@ func TestGetreadyInfo(t *testing.T) {
 		fmt.Println(v, v.Data)
 	}
 
-}
-
-func TestBuyMedicine(t *testing.T) {
-	GetABEKeys() //获取ABE服务上的密钥对
-	based.Init("zry",pub,prv)
-
-	fmt.Println("所有能解密的药品信息（药店卖药信息）")
-	trans,_ := based.GetTraFromDbByFilter(nil)
-	for _,v := range trans{
-		fmt.Println(v, v.Data)
-	}
-
-	BuyMedicine(*trans[0])
 }
 
