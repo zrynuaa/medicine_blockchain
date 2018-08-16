@@ -5,11 +5,19 @@ import (
 	"fmt"
 	"encoding/json"
 	"github.com/zrynuaa/medicine_blockchain/backend/based"
+	"github.com/zrynuaa/cpabe06_client/bswabe"
 )
 
-var drugstore1 Drugstore
-var drugstore2 Drugstore
-var drugstore3 Drugstore
+type Peer struct {
+	Typ int				//医院1、药店2、服务节点3
+	Store Drugstore
+	Hospital Hospital
+	Controller Controller
+
+	Port string
+}
+
+var drugstore Drugstore
 
 func setAccess(w http.ResponseWriter)  {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -25,56 +33,42 @@ func HospitalSendPrescription(w http.ResponseWriter, r *http.Request)  {
 	}
 }
 
-func Store1getMInfo(w http.ResponseWriter, r *http.Request)  {
+func StoregetMInfos(w http.ResponseWriter, r *http.Request)  {
 	setAccess(w)
 	var trans []Transaction
-	//trans = StoregetMInfo(drugstore1)
-	json.NewEncoder(w).Encode(trans)
-}
-
-func Store2getMInfo(w http.ResponseWriter, r *http.Request)  {
-	setAccess(w)
-	var trans []Transaction
-	//trans = StoregetMInfo(drugstore2)
-	json.NewEncoder(w).Encode(trans)
-}
-
-func Store3getMInfo(w http.ResponseWriter, r *http.Request)  {
-w.Header().Set("Access-Control-Allow-Origin", "*")
-	var trans []Transaction
-	//trans = StoregetMInfo(drugstore3)
+	trans = StoregetMInfo(drugstore)
 	json.NewEncoder(w).Encode(trans)
 }
 
 func Sethandle(w http.ResponseWriter, r *http.Request)  {
 	var tran Transaction
+	setAccess(w)
 	json.NewDecoder(r.Body).Decode(&tran)
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	StoresendTransaction(tran)
+	StoresendTransaction(tran, drugstore.ID)
 	fmt.Fprint(w,http.StatusOK)
 }
 
 func GetPrescriptions(w http.ResponseWriter, r *http.Request)  {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	pres,_,_ := GetreadyInfo("Prescription", r.FormValue("username"))
+	setAccess(w)
+	pres,_,_ := GetreadyInfo("prescription", r.FormValue("username"))
 	json.NewEncoder(w).Encode(pres)
 }
 
 func GetTransactions(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	_,trans,_ := GetreadyInfo("Transaction", r.FormValue("username"))
+	setAccess(w)
+	_,trans,_ := GetreadyInfo("transaction", r.FormValue("username"))
 	json.NewEncoder(w).Encode(trans)
 }
 
 func GetBuys(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	_,_,buys := GetreadyInfo("Buy", r.FormValue("username"))
+	setAccess(w)
+	_,_,buys := GetreadyInfo("buy", r.FormValue("username"))
 	json.NewEncoder(w).Encode(buys)
 }
 
 func UserbuyMedicine(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	setAccess(w)
 	var tran based.Transaction
 	json.NewDecoder(r.Body).Decode(&tran)
 
@@ -82,51 +76,37 @@ func UserbuyMedicine(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w,http.StatusOK)
 }
 
-func Run()  {
-	//if amount,_ := based.GetDosedata("mid1", "cid1", 1); amount == 0 {
-	//	AddDoses() //初始化化学名与药品对应关系以及药品价格
-	//}
+func Run(peer *Peer)  {
+	server := http.NewServeMux()
+	var pub *bswabe.BswabePub
+	var prv *bswabe.BswabePrv
 
-	finish := make(chan bool)
+	if peer.Typ == 1 {			//医院
+		pub,prv = GetABEKeys(peer.Hospital.Attrs) //获取ABE服务上的密钥对
+		based.Init(peer.Hospital.Name, pub, prv)
 
-	server8880 := http.NewServeMux()
-	AddHandletoServer(server8880, "hospital.html")
-	server8880.HandleFunc("/hospitalsendprescription", HospitalSendPrescription)
+		AddHandletoServer(server, "hospital.html")
+		server.HandleFunc("/hospitalsendprescription", HospitalSendPrescription)
+	}else if peer.Typ == 2 {	//药店
+		drugstore = peer.Store
 
-	server8881 := http.NewServeMux()
-	AddHandletoServer(server8881, "store.html")
-	drugstore1 = SetStore1Attrs()
-	server8881.HandleFunc("/getprelist8881", Store1getMInfo)
-	server8881.HandleFunc("/sethandle8881", Sethandle)
+		pub,prv = GetABEKeys(peer.Store.Attrs) //获取ABE服务上的密钥对
+		based.Init(peer.Store.Name, pub, prv)
+		AddDoses()
 
-	server8882 := http.NewServeMux()
-	AddHandletoServer(server8882, "store.html")
-	//drugstore2 = SetStore2Attrs()
-	server8882.HandleFunc("/getprelist8882", Store2getMInfo)
-	server8882.HandleFunc("/sethandle8882", Sethandle)
+		AddHandletoServer(server, "store.html")
+		server.HandleFunc("/getprelist" + peer.Port, StoregetMInfos)
+		server.HandleFunc("/sethandle" + peer.Port, Sethandle)
+	}else if peer.Typ ==3 {		//服务节点
+		pub,prv = GetABEKeys(peer.Controller.Attrs) //获取ABE服务上的密钥对
+		based.Init("Controller", pub, prv)
 
-	server8883 := http.NewServeMux()
-	AddHandletoServer(server8883, "store.html")
-	//drugstore3 = SetStore3Attrs()
-	server8883.HandleFunc("/getprelist8883", Store3getMInfo)
-	server8883.HandleFunc("/sethandle8883", Sethandle)
+		AddHandletoServer(server, "controller.html")
+		server.HandleFunc("/getprescriptions", GetPrescriptions)
+		server.HandleFunc("/gettransactions", GetTransactions)
+		server.HandleFunc("/getbuys", GetBuys)
+		server.HandleFunc("/userbuymedicine", UserbuyMedicine)
+	}
 
-	server8884 := http.NewServeMux()
-	AddHandletoServer(server8884, "controller.html")
-	server8884.HandleFunc("/getprescriptions", GetPrescriptions)
-	server8884.HandleFunc("/gettransactions", GetTransactions)
-	server8884.HandleFunc("/getbuys", GetBuys)
-	server8884.HandleFunc("/userbuymedicine", UserbuyMedicine)
-
-	server8885 := http.NewServeMux()
-	AddHandletoServer(server8885, "blockExplore.html")
-
-	go http.ListenAndServe(":8880", server8880)
-	go http.ListenAndServe(":8881", server8881)
-	go http.ListenAndServe(":8882", server8882)
-	go http.ListenAndServe(":8883", server8883)
-	go http.ListenAndServe(":8884", server8884)
-	go http.ListenAndServe(":8885", server8885)
-
-	<-finish
+	http.ListenAndServe(":" + peer.Port, server)
 }

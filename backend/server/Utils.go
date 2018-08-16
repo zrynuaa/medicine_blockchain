@@ -15,14 +15,12 @@ import (
 	"log"
 )
 
-//todo 1、卖药信息以及卖药信息的policy怎么设置		2、怎么封装成单节点
-
 var pub *bswabe.BswabePub
 var prv *bswabe.BswabePrv
-var attrs = "cid1 cid2 cid3 cid4 cid5 cid6 cid7 cid8 cid9 cid10 rid1 sid1" //节点属性
 
 //获取ABE服务器上的主公钥
-func GetABEKeys() {
+func GetABEKeys(attrs string) (*bswabe.BswabePub, *bswabe.BswabePrv) {
+
 	client, err := rpc.DialHTTP("tcp", "10.141.211.220:1234")
 	if err != nil {
 		log.Fatal("dialing:", err)
@@ -41,6 +39,8 @@ func GetABEKeys() {
 		log.Fatal("arith error:", err)
 	}
 	prv = bswabe.UnSerializeBswabePrv(pub, reply) //获取服务端返回的解密私钥
+
+	return pub, prv
 }
 
 func AddDoses()  {
@@ -56,19 +56,23 @@ func AddDoses()  {
 	d9 := based.Dose{Medicine_name:"mid9", Chemistry_name:"cid6", Medicine_amount:5, Medicine_price:2.5}
 	d10 := based.Dose{Medicine_name:"mid10", Chemistry_name:"cid7", Medicine_amount:6, Medicine_price:3.9}
 	d11 := based.Dose{Medicine_name:"mid11", Chemistry_name:"cid7", Medicine_amount:2, Medicine_price:0.9}
-	d12 := based.Dose{Medicine_name:"mid12", Chemistry_name:"cid7", Medicine_amount:1, Medicine_price:3.7}
+	d12 := based.Dose{Medicine_name:"mid12", Chemistry_name:"cid8", Medicine_amount:1, Medicine_price:3.7}
+	d13 := based.Dose{Medicine_name:"mid13", Chemistry_name:"cid8", Medicine_amount:1, Medicine_price:3.2}
+	d14 := based.Dose{Medicine_name:"mid14", Chemistry_name:"cid8", Medicine_amount:2, Medicine_price:2.1}
+	d15 := based.Dose{Medicine_name:"mid15", Chemistry_name:"cid9", Medicine_amount:3, Medicine_price:3}
+	d16 := based.Dose{Medicine_name:"mid16", Chemistry_name:"cid10", Medicine_amount:4, Medicine_price:2}
+	d17 := based.Dose{Medicine_name:"mid17", Chemistry_name:"cid10", Medicine_amount:1, Medicine_price:3.7}
 
 	var dose []based.Dose
-	dose = append(dose, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12)
+	dose = append(dose, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15, d16, d17)
 	for k,v := range dose {
 		based.PutIntoDb("dose", string(k), v.Serialize())
 	}
 }
 
 //医院发布处方信息
-func PrescriptiontoTransaction(pre HospitalPrescription) bool {
+func PrescriptiontoTransaction(pre HospitalPrescription, ) bool {
 
-	//prePolicy := "hid1 OR (cid AND rid1)"
 	prePolicy := "cid rid1 2of2 hid1 1of2"
 
 	var ptot based.Prescription
@@ -116,6 +120,7 @@ func PrescriptiontoTransaction(pre HospitalPrescription) bool {
 
 //药店获取能解密的处方信息,处理成药品信息
 func StoregetMInfo(store Drugstore) []Transaction {
+	based.QuickAccess()
 	pres,_ := based.GetPreFromDbByFilter(nil)//获取药店能够解密的所有的处方信息
 
 	num := len(pres)
@@ -163,7 +168,7 @@ func StoregetMInfo(store Drugstore) []Transaction {
 }
 
 //药店发布药品信息
-func StoresendTransaction(tran Transaction)  {
+func StoresendTransaction(tran Transaction, sid string)  {
 	var ttot based.Transaction
 
 	ttot.Type = 1
@@ -177,7 +182,7 @@ func StoresendTransaction(tran Transaction)  {
 	ttot.Transaction_id = tranid
 
 	//todo policy,药品信息只让本药店以及服务节点能看到，所以只用一个属性，药店id--sid
-	tranencdata := bswabe.SerializeBswabeCphKey(bswabe.CP_Enc(pub, string(ttot.Serialize()),"sid1"))
+	tranencdata := bswabe.SerializeBswabeCphKey(bswabe.CP_Enc(pub, string(ttot.Serialize()), sid))
 	_, err := based.PutIntoFabric("1", ttot.Transaction_id, tranencdata)
 	if err != nil {
 		fmt.Println(err)
@@ -185,15 +190,22 @@ func StoresendTransaction(tran Transaction)  {
 }
 
 //获取链上数据
-func GetreadyInfo(mark, username string) ([]*Presciption, []*Transaction, []*based.Buy) {
-	if mark == "Prescription"{
-		var pres []*Presciption
-		fil := make(map[string]string)
-		fil["patid"] = username
-		preget,_ := based.GetPreFromDbByFilter(fil)
+func GetreadyInfo(mark, username string) ([]*Prescription, []*Transaction, []*based.Buy) {
+	based.QuickAccess()
+	if mark == "prescription"{
+		var pres []*Prescription
+		var preget []*based.Prescription
+
+		if username == "*"{
+			preget,_ = based.GetPreFromDbByFilter(nil)
+		}else {
+			fil := make(map[string]string)
+			fil["patid"] = username
+			preget,_ = based.GetPreFromDbByFilter(fil)
+		}
 
 		for _,v := range preget{
-			pre := new(Presciption)
+			pre := new(Prescription)
 			pre.Data = v
 			if IsBuy(v.Prescription_id,"",""){
 				pre.Isbuy = 1
@@ -201,26 +213,38 @@ func GetreadyInfo(mark, username string) ([]*Presciption, []*Transaction, []*bas
 			pres = append(pres, pre)
 		}
 		return pres,nil,nil
-	}else if mark == "Transaction"{
+	}else if mark == "transaction"{
 		var trans []*Transaction
-		fil := make(map[string]string)
-		fil["patid"] = username
-		tranget,_ := based.GetTraFromDbByFilter(fil)
+		var tranget []*based.Transaction
+
+		if username == "*"{
+			tranget, _ = based.GetTraFromDbByFilter(nil)
+		}else {
+			fil := make(map[string]string)
+			fil["patid"] = username
+			tranget, _ = based.GetTraFromDbByFilter(fil)
+		}
 
 		for _,v := range tranget{
 			tran := new(Transaction)
 			tran.Data = v.Data
 			tran.Patient_id = v.Patient_id
+			tran.Transaction_id = v.Transaction_id
 			if IsBuy(v.Data.Prescription_id,"",""){
 				tran.Ishandled = 2
 			}
 			trans = append(trans, tran)
 		}
 		return nil,trans,nil
-	}else if mark == "Buy"{
-		fil := make(map[string]string)
-		fil["patid"] = username
-		buysget,_ := based.GetBuyFromDbByFilter(fil)
+	}else if mark == "buy"{
+		var buysget []*based.Buy
+		if username == "*" {
+			buysget, _ = based.GetBuyFromDbByFilter(nil)
+		}else {
+			fil := make(map[string]string)
+			fil["patid"] = username
+			buysget, _ = based.GetBuyFromDbByFilter(fil)
+		}
 
 		return nil,nil,buysget
 	}
@@ -254,18 +278,19 @@ func BuyMedicine(tran based.Transaction)  {
 	buyencdata := bswabe.SerializeBswabeCphKey(bswabe.CP_Enc(pub, string(buy.Serialize()),policy))
 
 	based.PutIntoFabric("2",buy.Buy_id,buyencdata)
-
 }
 
 func AddHandletoServer(server *http.ServeMux, filename string)  {
-	fss := http.FileServer(http.Dir(os.Getenv("GOPATH")+"/src/github.com/scottocs/medicine_blockchain/frontend/static"))
-	fsh := http.FileServer(http.Dir(os.Getenv("GOPATH")+"/src/github.com/scottocs/medicine_blockchain/frontend/html"))
+	fss := http.FileServer(http.Dir(os.Getenv("GOPATH")+"/src/github.com/zrynuaa/medicine_blockchain/frontend/static"))
+	fsh := http.FileServer(http.Dir(os.Getenv("GOPATH")+"/src/github.com/zrynuaa/medicine_blockchain/frontend/html"))
 	server.Handle("/static/", http.StripPrefix("/static/", fss))
 	server.Handle("/html/"+ filename, http.StripPrefix("/html/", fsh))
 }
 
+
+//todo
 func GetMedicineName(store Drugstore, cname string) []string {
-	var dose []*Dose
+	var dose []Dose
 	dose = store.Doses
 	num := len(dose)
 	for i:=0;i<num;i++{

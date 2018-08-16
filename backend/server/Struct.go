@@ -26,10 +26,22 @@ type Dose struct{
 //药店属性
 type Drugstore struct {
 	Name string
+	ID string
 	Location string
-	Attrs []string
-	Doses []*Dose
+	Attrs string
+	Doses []Dose
 }
+
+type Hospital struct {
+	Name string
+	ID string
+	Location string
+	Attrs string
+}
+
+type Controller struct {
+	Attrs string
+} 
 
 //药品信息
 type Transaction struct {
@@ -39,7 +51,7 @@ type Transaction struct {
 	Ishandled int `json:"ishandled"`//0药店未发布, 1药店已发布, 2处方已完成, 3该药店卖的
 }
 
-type Presciption struct {
+type Prescription struct {
 	Data *based.Prescription `json:"data"`
 	Isbuy int                `json:"isbuy"`		//0处方为处理, 1处方已处理
 }
