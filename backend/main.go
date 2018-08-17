@@ -2,28 +2,36 @@ package main
 
 import (
 	"github.com/zrynuaa/medicine_blockchain/backend/server"
+	"fmt"
+	"github.com/zrynuaa/medicine_blockchain/backend/based"
 )
 
 
 func main()  {
 	//todo 进入fabric目录 make restart
 
-	//based.Setup()		//整个系统只运行一次
+	based.Setup()		//整个系统只运行一次
 
 	finish := make(chan bool)
 
 	//开始启动节点
 	//hospital := &server.Peer{Typ:1, Hospital:Hospital1, Port:"8880"}
 	//controller := &server.Peer{Typ:3, Controller:Controller, Port: "8884"}
-	store1 := &server.Peer{Typ:2, Store:Store1, Port:"8881"}
+	//store1 := &server.Peer{Typ:2, Store:Store1, Port:"8881"}
 	//store2 := &server.Peer{Typ:2, Store:Store2, Port:"8882"}
-	//store3 := &server.Peer{Typ:2, Store:Store3, Port:"8883"}
+	store3 := &server.Peer{Typ:2, Store:Store3, Port:"8883"}
 
 	var peers []*server.Peer
 	//peers = append(peers, hospital, controller, store1, store2, store3)
-	peers = append(peers, store1)
+	//peers = append(peers, hospital)
+	//peers = append(peers, controller)
+	//peers = append(peers, store1)
+	//peers = append(peers, store2)
+	peers = append(peers, store3)
+
 
 	for _,v := range peers{
+		fmt.Println(v,"done!")
 		server.Run(v)
 	}
 
