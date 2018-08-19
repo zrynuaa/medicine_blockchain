@@ -61,12 +61,6 @@ func main() {
 	}
 
 	////开始启动节点
-	//hospital := &server.Peer{Typ:1, Hospital:Hospital1, Port:"8880"}
-	//controller := &server.Peer{Typ:3, Controller:Controller, Port: "8884"}
-	//store1 := &server.Peer{Typ:2, Store:Store1, Port:"8881"}
-	//store2 := &server.Peer{Typ:2, Store:Store2, Port:"8882"}
-	//store3 := &server.Peer{Typ:2, Store:Store3, Port:"8883"}
-
 	//var peers []*server.Peer
 	//peers = append(peers, hospital, controller, store1, store2, store3)
 	//peers = append(peers, hospital)

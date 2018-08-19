@@ -108,5 +108,6 @@ func Run(peer *Peer)  {
 		server.HandleFunc("/userbuymedicine", UserbuyMedicine)
 	}
 
+	fmt.Println("peer initial done!")
 	http.ListenAndServe(":" + peer.Port, server)
 }
