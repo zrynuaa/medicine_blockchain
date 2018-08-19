@@ -111,6 +111,9 @@ func synchronize(what int) error {
 		tempids = append(tempids, tempencids[i])
 		temppres = append(temppres, result)
 	}
+	if len(tempids) == 0 {
+		return nil
+	}
 	//update db
 	LastId[what] = tempids[len(tempids)-1]
 	types := whatmap[what]

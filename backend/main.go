@@ -10,7 +10,7 @@ import (
 func main() {
 	//todo 进入fabric目录 make restart
 
-	based.Setup() //整个系统只需运行一次
+	based.Setup()		//整个系统只运行一次
 
 	finish := make(chan bool)
 
@@ -69,9 +69,14 @@ func main() {
 
 	//var peers []*server.Peer
 	//peers = append(peers, hospital, controller, store1, store2, store3)
+	//peers = append(peers, hospital)
+	//peers = append(peers, controller)
+	//peers = append(peers, store1)
 	//peers = append(peers, store2)
+	//peers = append(peers, store3)
 	//
 	//for _,v := range peers{
+	//	fmt.Println(v,"done!")
 	//	server.Run(v)
 	//}
 
