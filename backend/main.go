@@ -21,9 +21,7 @@ func main() {
 	controller := &server.Peer{Typ: 3, Controller: Controller, Port: "8884"}
 
 	arg_num := len(os.Args)
-	for k,v := range os.Args {
-		fmt.Print(k,v,"  ")
-	}
+
 	if arg_num == 4 ||  arg_num == 3 {
 		if os.Args[1] == "controller" { //服务节点
 			if len(os.Args) == 4 {
