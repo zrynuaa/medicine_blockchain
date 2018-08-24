@@ -24,12 +24,22 @@ var chemistry = {
 }
 
 var hospital = {
-  "hid1":"中医院",
+  "hid1":"中山医院",
 }
 
 var store = {
-  "store1":"吉星大药房",
-  "store2":"如意小药店",
+    "store1":{
+        name: "吉星大药房",
+        location: "上海市杨浦区邯郸路666号",
+    },
+    "store2":{
+        name: "如意小药店",
+        location: "上海市浦东新区张横路888号",
+    },
+    "store3":{
+        name: "泽宁亮亮联盟药店",
+        location: "上海市徐汇区枫林路188号",
+    },
 }
 
 var patient = {

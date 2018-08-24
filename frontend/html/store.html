@@ -25,7 +25,11 @@
         <li><a href="#Pending" data-toggle="tab" @click="getPendingList()"><h2>已接单</h2></a></li>
         <!-- <li><a href="#Archive" data-toggle="tab" ><h2></h2></a></li> -->
         <li><a href="#Closed" data-toggle="tab" @click="getClosedList()"><h2>已成交</h2></a></li>
-        <h1 class="pull-right">{{store.name}}</h1>
+        <span class="pull-right">
+            <h1>{{store.name}}</h1>
+            <h4>{{store.location}}</h4>
+        </span>
+
       </ul>
       <div class="tab-content">
         <div class="tab-pane fade margin-top-5 in active" id="Pool">
@@ -127,6 +131,13 @@
           usage: "",
           amount: "",
         },
+        map: {
+            medicine:   medicine,
+            hospital:   hospital,
+            chemistry:  chemistry,
+            store:      store,
+            patient:    patient,
+        },
   		}
   	},
   	methods: {
@@ -224,34 +235,35 @@
         return 0
   		},
       getPort: function(){
-        if (location.port=="8881") { this.storeID = 1  }
-        if (location.port=="8882") { this.storeID = 2  }
-        if (location.port=="8883") { this.storeID = 3  }
+        if (location.port=="8881") { this.storeID = "store1"  }
+        if (location.port=="8882") { this.storeID = "store2"  }
+        if (location.port=="8883") { this.storeID = "store3"  }
   		},
       checkStore: function(){
-        if (this.storeID==1) {
-          this.store = {
-            name: "药店A - 吉星大药房",
-            sid: "10086",
-            type: 1,
-            site: "邯郸路220号",
-          }
-        }else if(this.storeID==2){
-          this.store = {
-            name: "药店B - 如意小药店",
-            sid: "10010",
-            type: 1,
-            site: "闵大荒",
-          }
-        }else{
-          this.store = {
-            name: "药店C - 亮亮连锁药店",
-            sid: "66666",
-            type: 1,
-            site: "杨浦区",
-          }
-        }
-  		},
+        // if (this.storeID==1) {
+        //   this.store = {
+        //     name: "药店A - 吉星大药房",
+        //     sid: "10086",
+        //     type: 1,
+        //     site: "邯郸路220号",
+        //   }
+        // }else if(this.storeID==2){
+        //   this.store = {
+        //     name: "药店B - 如意小药店",
+        //     sid: "10010",
+        //     type: 1,
+        //     site: "闵大荒",
+        //   }
+        // }else{
+        //   this.store = {
+        //     name: "药店C - 亮亮连锁药店",
+        //     sid: "66666",
+        //     type: 1,
+        //     site: "杨浦区",
+        //   }
+        // }
+        this.store = this.map.store[this.storeID]
+        },
   	},
   	computed: {
   	},

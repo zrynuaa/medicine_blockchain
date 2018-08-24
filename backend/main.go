@@ -89,7 +89,7 @@ var d10 = server.Dose{Cname: "cid10", Mname: []string{"mid16", "mid17"}}
 
 var doses1 = []server.Dose{d1, d2, d3, d4, d5, d6, d7, d8, d9, d10}
 var Store1 = server.Drugstore{
-	Name:     "管星大药房",
+	Name:     "吉星大药房",
 	ID:       "sid1",
 	Location: "上海市杨浦区邯郸路666号",
 	Attrs:    "cid1 cid2 cid3 cid4 cid5 cid6 cid7 cid8 cid9 cid10 rid1 sid1",
@@ -107,7 +107,7 @@ var Store2 = server.Drugstore{
 
 var doses3 = []server.Dose{d1, d2, d3, d4, d5, d6, d7, d9}
 var Store3 = server.Drugstore{
-	Name:     "泽宁大药店",
+	Name:     "泽宁亮亮联盟药店",
 	ID:       "sid3",
 	Location: "上海市徐汇区枫林路188号",
 	Attrs:    "cid1 cid2 cid3 cid4 cid5 cid6 cid7 cid9 rid1 sid3",

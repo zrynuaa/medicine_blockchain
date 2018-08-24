@@ -46,7 +46,7 @@ make restart
 * 运行医药分开系统
 
 ```
-cd $GOPATH/src/gihub.com/zrynuaa/cpabe06_client
+cd $GOPATH/src/github.com/zrynuaa/medicine_blockchain
 
 ./start.sh
 
