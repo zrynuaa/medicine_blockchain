@@ -104,6 +104,11 @@ func synchronize(what int) error {
 	var tempids []string
 	var temppres [][]byte
 	for i, j := range tempencpres {
+		tmp := []byte(j)
+		if len(tmp) == 0 {
+			fmt.Println("=================len(j)=0")
+			continue
+		}
 		result := bswabe.CP_Dec(pk, sk, bswabe.UnSerializeBswabeCphKey(pk, []byte(j)))
 		if string(result) == "" {
 			continue
