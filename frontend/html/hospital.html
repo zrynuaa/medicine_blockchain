@@ -11,6 +11,11 @@
 
     <link rel="stylesheet" href="../static/css/bootstrap.min.css">
 
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
     <style media="screen">
       .margin-top-5{margin-top: 5px;}
       .padding-side-100{padding-left: 100px;padding-right: 100px;}
@@ -88,7 +93,19 @@
 
       <div class="row margin-top-5 padding-side-100">
         <div class="col-md-12">
-          <button class="btn btn-info btn-block btn-lg" @click="publish()">publish</button>
+          <el-button
+            type="primary"
+            @click="publish()"
+            v-loading.fullscreen.lock="busy">
+            publish
+          </el-button>
+          <!-- <button 
+          class="btn btn-info btn-block btn-lg" 
+          @click="publish()" 
+          v-show="!busy"
+          v-loading.fullscreen.lock="fullscreenLoading"
+          >publish</button>
+          <button class="btn btn-info btn-block btn-lg" @click="publish()" v-show="busy">publish</button> -->
         </div>
       </div>
 
@@ -201,6 +218,8 @@
         return 0
   		},
   		publish: function(){
+        let _this = this
+        _this.busy = true
         var postData = {
             "hospital_id":this.new_data.hospital,
             "patient_id":this.new_data.patient,
@@ -218,6 +237,7 @@
           data: JSON.stringify(postData),
           success: function(result){
             console.log(result);
+            _this.busy = false
             alert("success")
             //code:: notice hospital the result.
           },
