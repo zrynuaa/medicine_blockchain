@@ -136,7 +136,7 @@ func StoregetMInfo(store Drugstore) []Transaction {
 		for _,name := range mname {
 			tran.Data = new(based.Data_tran)
 			tran.Data.Prescription_id = pres[i].Prescription_id
-			tran.Data.Ts = uint64(time.Now().Unix())
+			tran.Data.Ts = pres[i].Ts
 			tran.Data.Site = store.Location
 
 			tran.Data.Medicine_name = name
