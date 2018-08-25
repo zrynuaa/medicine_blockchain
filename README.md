@@ -17,11 +17,15 @@ Fabric的SDK（go语言）
 
 https://github.com/thorweiyan/fabric_go_sdk
 
-CPABE06的实现，基于RPC服务，Server部署在学校内网服务器，运行系统需要能够连接内网
+
+
+CPABE06的实现，基于RPC服务，Server部署在复旦内网服务器，运行系统需要能够连接内网
 
 https://github.com/zrynuaa/cpabe06_client
 
+CPABE实现参考文献：J. Bethencourt, A. Sahai, B. Waters. Ciphertext-Policy Attribute-Based Encryption. 
 
+*注：如果有需要获取CPABE server部分，请联系royzhang.go@gmail.com或者zry_nuaa@163.com*
 
 ## 步骤
 
@@ -35,7 +39,7 @@ go get github.com/zrynuaa/cpabe06_client
 
 ### 2.Step by Step
 
-* 启动Fabric基础网络（好像还需要dep ensure？）
+* 启动Fabric基础网络（需要dep ensure）
 
 ```
 cd $GOPATH/src/gihub.com/thorweiyan/fabric_go_sdk
