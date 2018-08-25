@@ -23,7 +23,7 @@ CPABE06的实现，基于RPC服务，Server部署在复旦内网服务器，运�
 
 https://github.com/zrynuaa/cpabe06_client
 
-CPABE实现参考文献：J. Bethencourt, A. Sahai, B. Waters. Ciphertext-Policy Attribute-Based Encryption. 
+CPABE实现参考文献[BSW06]：
 
 *注：如果有需要获取CPABE server部分，请联系royzhang.go@gmail.com或者zry_nuaa@163.com*
 
@@ -76,3 +76,6 @@ http://localhost:8883/html/store.html
 http://localhost:8884/html/controller.html
 ```
 
+### 3.Reference
+
+[BSW06]  J. Bethencourt, A. Sahai, B. Waters. Ciphertext-Policy Attribute-Based Encryption, 2006
