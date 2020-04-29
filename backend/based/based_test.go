@@ -1,17 +1,16 @@
 package based
 
 import (
-	"testing"
 	"fmt"
 	"github.com/syndtr/goleveldb/leveldb"
+	"testing"
 )
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //新增的test
 func TestSplitBytesbyn(t *testing.T) {
 	Name = "czn"
-	db,_ = leveldb.OpenFile("./db/" + Name + ".db", nil)
+	db, _ = leveldb.OpenFile("./db/"+Name+".db", nil)
 	Setup()
 	go TimingAccess()
 	var one = new(Prescription)
@@ -33,7 +32,7 @@ func TestSplitBytesbyn(t *testing.T) {
 	}
 	fmt.Println(tid)
 	QuickAccess()
-	res,err :=GetFromDbById("prescription","123456")
+	res, err := GetFromDbById("prescription", "123456")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -41,7 +40,7 @@ func TestSplitBytesbyn(t *testing.T) {
 	fmt.Println(DeserializePrescription(res))
 	fil := make(map[string]string)
 	fil["patid"] = "pat1"
-	res2, err :=GetPreFromDbByFilter(fil)
+	res2, err := GetPreFromDbByFilter(fil)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -49,7 +48,7 @@ func TestSplitBytesbyn(t *testing.T) {
 	fmt.Println(res2)
 	fil2 := make(map[string]string)
 	fil2["patid"] = "pat2"
-	res3, err :=GetPreFromDbByFilter(fil2)
+	res3, err := GetPreFromDbByFilter(fil2)
 	if err != nil {
 		fmt.Println(err)
 		return

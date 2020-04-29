@@ -35,13 +35,13 @@
         <div class="tab-pane fade margin-top-5 in active" id="Pool">
           <v-client-table :columns="columns.pool" :data="lines.pool" :options="options">
               <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div>
-              <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-on:click="handle(props.row)" v-bind:disabled="props.row.ishandled!=0"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==0"> 接单</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=0"></span></button></div>
+              <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-on:click="handle(props.row)" v-bind:disabled="props.row.ishandled!=0||props.row.busy"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==0"> 接单</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=0"></span></button></div>
           </v-client-table>
         </div>
         <div class="tab-pane fade margin-top-5" id="Pending">
           <v-client-table :columns="columns.pending" :data="lines.pending" :options="options">
               <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div>
-              <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-bind:disabled="props.row.ishandled==3"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==3"> 抢到</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=3"></span></button></div>
+              <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-bind:disabled="props.row.ishandled==3"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==3||props.row.busy"> 抢到</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=3"></span></button></div>
           </v-client-table>
         </div>
         <div class="tab-pane fade margin-top-5" id="Archive">
@@ -49,7 +49,7 @@
         <div class="tab-pane fade margin-top-5" id="Closed">
             <v-client-table :columns="columns.closed" :data="lines.closed" :options="options">
                 <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div>
-                <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-bind:disabled="props.row.ishandled!=1"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==2"> 被抢</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=2"></span></button></div>
+                <div slot="ishandled" slot-scope="props"><button class="btn btn-block btn-sm btn-success" v-bind:disabled="props.row.ishandled!=1"><span class="glyphicon glyphicon-plus" v-show="props.row.ishandled==2||props.row.busy"> 被抢</span><span class="glyphicon glyphicon-ok" v-show="props.row.ishandled!=2"></span></button></div>
             </v-client-table>
         </div>
       </div>
@@ -156,6 +156,8 @@
   		handle: function(row){
   			var _this = this;
   			var postData = {};
+        _this.lines.pool[row.key].busy = true
+
         postData["patient_id"] = row["patient_id"]
         postData.data = {}
         postData.data.presciption_id = row["presciption_id"]
@@ -176,6 +178,7 @@
           success: function(result){
             if (result==200) {
                 console.log("xxxxxxx");
+                _this.lines.pool[row.key].busy = false
                 _this.lines.pool[row.key].ishandled = 1
             }
           },
@@ -208,6 +211,7 @@
                 tmp["site"] = v.data.site
                 tmp["price"] = v.data.price
                 tmp["ishandled"] = v.ishandled
+                tmp.busy = false
 
                 if (v.ishandled==3) {
                   tmp["key"] = cnt_pending++

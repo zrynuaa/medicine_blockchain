@@ -10,7 +10,7 @@ import (
 func main() {
 	//todo 进入fabric目录 make restart
 
-	based.Setup()		//整个系统只运行一次
+	based.Setup() //整个系统只运行一次
 
 	finish := make(chan bool)
 
@@ -22,7 +22,7 @@ func main() {
 
 	arg_num := len(os.Args)
 
-	if arg_num == 4 ||  arg_num == 3 {
+	if arg_num == 4 || arg_num == 3 {
 		if os.Args[1] == "controller" { //服务节点
 			if len(os.Args) == 4 {
 				controller.Port = os.Args[3] //改端口
@@ -54,7 +54,7 @@ func main() {
 
 			}
 		}
-	}else {
+	} else {
 		fmt.Println("error arguments, need 4 or 3! (./main peer num port)")
 	}
 

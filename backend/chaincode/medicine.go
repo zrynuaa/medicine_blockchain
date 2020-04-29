@@ -9,8 +9,8 @@ import (
 
 type System struct {
 	prescriptionID []string
-	medicineID []string
-	buyID []string
+	medicineID     []string
+	buyID          []string
 }
 
 func (t *System) Init(stub shim.ChaincodeStubInterface) peer.Response {
@@ -46,21 +46,20 @@ func (t *System) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 }
 
 //医院、药店、患者上传处方、卖药、买药信息，args（func, type，ID，value）1处方信息，2卖药信息，3买药信息
-func (t *System)Putinfo(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (t *System) Putinfo(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	if len(args) != 4 {
 		return shim.Error("The number of arguments is insufficient.")
 	}
 
-	if args[1] == "0" && isNotExist(t.prescriptionID, args[2]){
+	if args[1] == "0" && isNotExist(t.prescriptionID, args[2]) {
 		t.prescriptionID = append(t.prescriptionID, args[2])
-	} else if args[1] == "1" && isNotExist(t.medicineID, args[2]){
+	} else if args[1] == "1" && isNotExist(t.medicineID, args[2]) {
 		t.medicineID = append(t.medicineID, args[2])
-	} else if args[1] == "2" && isNotExist(t.buyID, args[2]){
+	} else if args[1] == "2" && isNotExist(t.buyID, args[2]) {
 		t.buyID = append(t.buyID, args[2])
 	} else {
 		return shim.Error("id already exists!")
 	}
-
 
 	// t.prescriptionID = append(t.prescriptionID, args[0])
 	err := stub.PutState(args[2], []byte(args[3]))
@@ -76,7 +75,7 @@ func (t *System)Putinfo(stub shim.ChaincodeStubInterface, args []string) peer.Re
 }
 
 //传进来本地最新的一个ID，获取这个ID后面所有的新的ID,返回
-func (t *System)GetIDs(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (t *System) GetIDs(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	preIDlist, err := t.getids(args)
 	if err != nil {
 		return shim.Error(err.Error())
@@ -84,7 +83,7 @@ func (t *System)GetIDs(stub shim.ChaincodeStubInterface, args []string) peer.Res
 
 	//将[]string转换成[]byte，每个string用"\n"隔开
 	var rs []byte
-	for _,v := range preIDlist{
+	for _, v := range preIDlist {
 		rs = append(rs, []byte(v)...)
 		rs = append(rs, []byte("\n\n")...)
 	}
@@ -93,21 +92,21 @@ func (t *System)GetIDs(stub shim.ChaincodeStubInterface, args []string) peer.Res
 }
 
 //传进来本地最新的一个ID，获取这个ID后面所有的新的信息,返回
-func (t *System)Getpres(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (t *System) Getpres(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	preIDlist, err := t.getids(args)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 	var prelist []string
 
-	for _, preid := range preIDlist{
+	for _, preid := range preIDlist {
 		value, _ := stub.GetState(preid)
 		prelist = append(prelist, string(value))
 	}
 
 	//将[]string转换成[]byte，每个string用"\n"隔开
 	var rs []byte
-	for _,v := range prelist{
+	for _, v := range prelist {
 		rs = append(rs, []byte(v)...)
 		rs = append(rs, []byte("\n\n")...)
 	}
@@ -115,7 +114,7 @@ func (t *System)Getpres(stub shim.ChaincodeStubInterface, args []string) peer.Re
 	return shim.Success(rs)
 }
 
-func (t *System)getids(args []string) ([]string, error) {
+func (t *System) getids(args []string) ([]string, error) {
 	if len(args) != 3 {
 		return []string{""}, fmt.Errorf("The number of arguments is insufficient.")
 	}
@@ -123,12 +122,12 @@ func (t *System)getids(args []string) ([]string, error) {
 	var list []string
 	if args[1] == "0" {
 		list = t.prescriptionID
-	}else if args[1] == "1" {
+	} else if args[1] == "1" {
 		list = t.medicineID
-	}else if args[1] == "2" {
+	} else if args[1] == "2" {
 		list = t.buyID
 	}
-	var po= -1
+	var po = -1
 	//传入空id,返回所有id
 	if args[2] == "" {
 		return list, nil
@@ -148,7 +147,7 @@ func (t *System)getids(args []string) ([]string, error) {
 }
 
 func isNotExist(a []string, b string) bool {
-	for _,j := range a{
+	for _, j := range a {
 		if j == b {
 			return false
 		}

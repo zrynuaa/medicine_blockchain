@@ -2,9 +2,9 @@ package based
 
 import (
 	"fmt"
-	"time"
-	"strconv"
 	"github.com/zrynuaa/cpabe06_client/bswabe"
+	"strconv"
+	"time"
 )
 
 //初始化，只在一开始调用一次
@@ -27,7 +27,7 @@ func Setup() {
 }
 
 //对应cc中的putinfo
-func putInfo(what string, id string, value string) (string, error){
+func putInfo(what string, id string, value string) (string, error) {
 	trcid, err := fSetup.Invoke([]string{"invoke", "putinfo", what, id, value})
 	if err != nil {
 		return "", fmt.Errorf("invoke putinfo error!:%v", err)
@@ -36,7 +36,7 @@ func putInfo(what string, id string, value string) (string, error){
 }
 
 //对应cc中的getids
-func getIds(what,id string) (string, error){
+func getIds(what, id string) (string, error) {
 	payload, err := fSetup.Query([]string{"invoke", "getids", what, id})
 	if err != nil {
 		return "", fmt.Errorf("query getids error!:%v", err)
@@ -45,7 +45,7 @@ func getIds(what,id string) (string, error){
 }
 
 //对应cc中的getpres
-func getPres(what,id string) (string, error){
+func getPres(what, id string) (string, error) {
 	payload, err := fSetup.Query([]string{"invoke", "getpres", what, id})
 	if err != nil {
 		return "", fmt.Errorf("query getpres error!:%v", err)
@@ -66,7 +66,7 @@ func TimingAccess() {
 }
 
 //快速获取
-func QuickAccess() error{
+func QuickAccess() error {
 	fmt.Println("Access to Fabric")
 	for i := 0; i < 3; i++ {
 		err := synchronize(i)

@@ -76,7 +76,7 @@
                       <div slot="medicine_name" slot-scope="props">{{medicine[props.row.medicine_name]}} - {{props.row.medicine_name}}</div>
                       <div slot="patient_id" slot-scope="props">{{patient[props.row.patient_id]}}</div>
                       <div slot="_ts" slot-scope="props"><span style="display:none;">{{props.row.ts}}</span>{{props.row._ts}}</div>
-                      <div slot="buy" slot-scope="props"><button class="btn btn-success btn-md btn-block" @click="buy(props.row, $event)" :disabled="props.row.ishandled>1">选择</button></div>
+                      <div slot="buy" slot-scope="props"><button class="btn btn-success btn-md btn-block" @click="buy(props, $event)" :disabled="props.row.ishandled>1 || buy_modal.busy">选择</button></div>
                   </v-client-table>
                 </div>
               </div>
@@ -274,10 +274,14 @@
       				}else{alert("Error!Code: "+status);}
       			});
           },
-          buy: function(row){
+          buy: function(props, e){
+              let row = props.row
+              let k = props.index - 1
 
       			var _this = this;
-      			var postData = {};
+      			var postData = {}
+      			_this.buy_modal.busy = true
+
             postData.patient_id = row["patient_id"]
             postData.ishandled = row["ishandled"]
             postData.data = {}
@@ -298,6 +302,7 @@
               data: JSON.stringify(postData),
               success: function(result){
                   console.log(result);
+                  _this.buy_modal.busy = false
                   // console.log("xxxxxxx");
                   // _this.lines.pool[row.key].ishandled = 1
               },

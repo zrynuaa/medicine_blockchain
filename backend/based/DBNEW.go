@@ -7,25 +7,23 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
-
-
 //输入类型what，0代表pre，1代表tran，2代表buy，id和value
-func PutIntoFabric(what string, id string, value []byte) (string,error){
+func PutIntoFabric(what string, id string, value []byte) (string, error) {
 	return putInfo(what, id, string(value))
 }
 
 //types有prescription，transaction，buy
-func GetFromDbById(types string, id string) ([]byte, error){
+func GetFromDbById(types string, id string) ([]byte, error) {
 	key := append(commandToBytes(types), []byte(id)...)
 	data, err := db.Get(key, nil)
 	if err != nil {
 		return []byte(""), fmt.Errorf("getFromDbById error, type:%s, id:%s\n", types, id)
 	}
-	return data,nil
+	return data, nil
 }
 
 //从db中获取pre信息，filter为map，示例见test，下同
-func GetPreFromDbByFilter(fil map[string]string) ([]*Prescription, error){
+func GetPreFromDbByFilter(fil map[string]string) ([]*Prescription, error) {
 	var result []*Prescription
 	var flag bool
 	all, err := getAllFromDb("prescription")
@@ -52,7 +50,7 @@ func GetPreFromDbByFilter(fil map[string]string) ([]*Prescription, error){
 	return result, nil
 }
 
-func GetTraFromDbByFilter(fil map[string]string) ([]*Transaction, error){
+func GetTraFromDbByFilter(fil map[string]string) ([]*Transaction, error) {
 	var result []*Transaction
 	var flag bool
 	all, err := getAllFromDb("transaction")
@@ -80,7 +78,7 @@ func GetTraFromDbByFilter(fil map[string]string) ([]*Transaction, error){
 	return result, nil
 }
 
-func GetBuyFromDbByFilter(fil map[string]string) ([]*Buy, error){
+func GetBuyFromDbByFilter(fil map[string]string) ([]*Buy, error) {
 	var result []*Buy
 	var flag bool
 	all, err := getAllFromDb("buy")
@@ -109,7 +107,7 @@ func GetBuyFromDbByFilter(fil map[string]string) ([]*Buy, error){
 }
 
 //获取剂量信息
-func GetDoseFromDb(medicine_name string, chemistry_name string, chemistry_amount int) (int,float32,error) {
+func GetDoseFromDb(medicine_name string, chemistry_name string, chemistry_amount int) (int, float32, error) {
 	//一个剂量化学名对应的药品剂量
 	var mamount int = 0
 	//一剂量药品单价
@@ -160,7 +158,7 @@ func commandToBytes(command string) []byte {
 }
 
 //将解密后的信息存到db中，应在abe解密之后调用，types为presciption、transaction、buy等
-func PutIntoDb(types string, id string, value []byte) error{
+func PutIntoDb(types string, id string, value []byte) error {
 	var key []byte
 	key = append(commandToBytes(types), []byte(id)...)
 	err := db.Put(key, value, nil)

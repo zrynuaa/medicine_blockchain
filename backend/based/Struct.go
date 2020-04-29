@@ -1,16 +1,16 @@
 package based
 
 import (
-	"encoding/gob"
 	"bytes"
+	"encoding/gob"
 	"log"
 )
 
 type Data_pre struct {
-	Doctor_id string `json:"doctor_id"`
-	Disease string `json:"disease"`
+	Doctor_id      string `json:"doctor_id"`
+	Disease        string `json:"disease"`
 	Chemistry_name string `json:"chemistry_name"`
-	Amount int `json:"amount"`
+	Amount         int    `json:"amount"`
 }
 
 type Data_tran struct {
@@ -42,10 +42,10 @@ type Prescription struct {
 }
 
 type Transaction struct {
-	Type int `json:"type"`
-	Transaction_id string `json:"transaction_id"`
-	Patient_id string `json:"patient_id"`
-	Data *Data_tran `json:"data"`
+	Type           int        `json:"type"`
+	Transaction_id string     `json:"transaction_id"`
+	Patient_id     string     `json:"patient_id"`
+	Data           *Data_tran `json:"data"`
 }
 
 type Dose struct {
@@ -75,20 +75,20 @@ type prescription struct {
 }
 
 type transaction struct {
-	Type int
+	Type           int
 	Transaction_id string
-	Patient_id string
-	Data_tran []byte
+	Patient_id     string
+	Data_tran      []byte
 }
 
 type buy struct {
-	Type int
-	Buy_id string
-	Data_buy []byte
+	Type       int
+	Buy_id     string
+	Data_buy   []byte
 	Patient_id string
 }
 
-func (b *Data_pre)serialize() []byte {
+func (b *Data_pre) serialize() []byte {
 	var result bytes.Buffer
 
 	encoder := gob.NewEncoder(&result)
@@ -112,7 +112,7 @@ func deserializeDatapre(d []byte) *Data_pre {
 	return dp
 }
 
-func (b *Data_tran)serialize() []byte {
+func (b *Data_tran) serialize() []byte {
 	var result bytes.Buffer
 
 	encoder := gob.NewEncoder(&result)
@@ -136,7 +136,7 @@ func deserializeDatatran(d []byte) *Data_tran {
 	return dt
 }
 
-func (b *Data_buy)serialize() []byte {
+func (b *Data_buy) serialize() []byte {
 	var result bytes.Buffer
 
 	encoder := gob.NewEncoder(&result)
@@ -160,7 +160,7 @@ func deserializeDatabuy(d []byte) *Data_buy {
 	return dt
 }
 
-func (b *Prescription)Serialize() []byte {
+func (b *Prescription) Serialize() []byte {
 	var result bytes.Buffer
 	temp := new(prescription)
 
@@ -202,7 +202,7 @@ func DeserializePrescription(d []byte) *Prescription {
 	return dp
 }
 
-func (b *Transaction)Serialize() []byte {
+func (b *Transaction) Serialize() []byte {
 	var result bytes.Buffer
 	temp := new(transaction)
 
@@ -238,7 +238,7 @@ func deserializeTransaction(d []byte) *Transaction {
 	return dp
 }
 
-func (b *Dose)Serialize() []byte {
+func (b *Dose) Serialize() []byte {
 	var result bytes.Buffer
 
 	encoder := gob.NewEncoder(&result)
@@ -262,7 +262,7 @@ func deserializeDose(d []byte) *Dose {
 	return dt
 }
 
-func (b *Buy)Serialize() []byte {
+func (b *Buy) Serialize() []byte {
 	var result bytes.Buffer
 	temp := new(buy)
 

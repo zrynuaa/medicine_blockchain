@@ -29,4 +29,4 @@ var Omega = []string{
 	"region7",
 	"region8",
 	"region9",
-	}
+}
