@@ -3,7 +3,7 @@ package based
 import "strings"
 import (
 	"bytes"
-	"github.com/Doresimon/SM-Collection/SM3"
+	"github.com/BlockchainLabFudan/SM-Collection/SM3"
 	"strconv"
 )
 

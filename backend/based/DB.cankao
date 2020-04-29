@@ -4,8 +4,6 @@ import (
 	"github.com/syndtr/goleveldb/leveldb"
 	"strconv"
 	"strings"
-	//"fmt"
-	"github.com/Doresimon/SM-Collection/SM3"
 	"fmt"
 )
 var Sdb_Pre, _ = leveldb.OpenFile("./db/Prescription.db", nil)

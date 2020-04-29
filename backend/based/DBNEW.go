@@ -1,8 +1,6 @@
 package based
 
 import (
-	//"fmt"
-	//"github.com/Doresimon/SM-Collection/SM3"
 	"fmt"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
